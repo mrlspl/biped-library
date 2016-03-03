@@ -35,32 +35,39 @@
 
 #include <vector>
 
-class DHFrame
+#include "Angle.hpp"
+
+namespace BipedLibrary
 {
-public:
-    DHFrame();
-    
-    float theta() const;
-    float alpha() const;
-    float r() const;
-    float d() const;
-    std::vector<DHFrame&> const& fellows() const;
-    DHFrame const& fellow(unsigned i) const;
-    
-    DHFrame& setTheta(float theta);
-    DHFrame& setAlpha(float alpha);
-    DHFrame& setR(float r);
-    DHFrame& setD(float d);
-    DHFrame& setFellows(std::vector<DHFrame&> fellows);
-    
-private:
-    float theta_;
-    float alpha_;
-    float r_;
-    float d_;
-    
-    std::vector<DHFrame&> fellows_;
-};
 
+    class DHFrame
+    {
+    public:
+        DHFrame(Angle const alpha = 0, Angle const theta = 0, float const r = 0, float const d = 0);
 
+        Angle theta() const;
+        Angle alpha() const;
+        float r() const;
+        float d() const;
+        std::vector<DHFrame*> const& fellows() const;
+        DHFrame const* fellow(unsigned i) const;
 
+        DHFrame& setTheta(Angle const theta);
+        DHFrame& setAlpha(Angle const alpha);
+        DHFrame& setR(float const r);
+        DHFrame& setD(float const d);
+        DHFrame& setFellows(std::vector<DHFrame*> const fellows);
+
+        DHFrame* mutableFellow(unsigned const i);
+        std::vector<DHFrame*> & mutableFellows();
+
+    private:
+        Angle theta_;
+        Angle alpha_;
+        float r_;
+        float d_;
+
+        std::vector<DHFrame*> fellows_;
+    };
+
+}

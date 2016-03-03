@@ -31,7 +31,100 @@
  * Created on February 29, 2016, 9:21 PM
  */
 
+#include <stdexcept>
+
 #include "DHFrame.hpp"
 
-DHFrame::DHFrame() {
+using namespace BipedLibrary;
+
+DHFrame::DHFrame(Angle const alpha, Angle const theta, float const r, float const d) :
+theta_(theta),
+alpha_(alpha),
+r_(r),
+d_(d)
+{
+}
+
+Angle DHFrame::theta() const
+{
+    return theta_;
+}
+
+Angle DHFrame::alpha() const
+{
+    return alpha_;
+}
+
+float DHFrame::r() const
+{
+    return r_;
+}
+
+float DHFrame::d() const
+{
+    return d_;
+}
+
+std::vector<DHFrame*> const& DHFrame::fellows() const
+{
+    return fellows_;
+}
+
+DHFrame const* DHFrame::fellow(unsigned i) const
+{
+    try
+    {
+        return fellows_.at(i);
+    }
+    catch(std::out_of_range &)
+    {
+        throw(std::out_of_range("Access to out of range fellow in DHFrame::fellow(unsinged)."));
+    }
+}
+
+DHFrame& DHFrame::setTheta(Angle const theta)
+{
+    theta_ = theta;
+    return *this;
+}
+
+DHFrame& DHFrame::setAlpha(Angle const alpha)
+{
+    alpha_ = alpha;
+    return *this;
+}
+
+DHFrame& DHFrame::setR(float const r)
+{
+    r_ = r;
+    return *this;
+}
+
+DHFrame& DHFrame::setD(float const d)
+{
+    d_ = d;
+    return *this;
+}
+
+DHFrame& DHFrame::setFellows(std::vector<DHFrame*> const fellows)
+{
+    fellows_ = fellows;
+    return *this;
+}
+
+DHFrame * DHFrame::mutableFellow(unsigned const i)
+{
+    try
+    {
+        return fellows_.at(i);
+    }
+    catch(std::out_of_range &)
+    {
+        throw(std::out_of_range("Access to out of range fellow in DHFrame::mutableFellow(unsinged)."));
+    }
+}
+
+std::vector<DHFrame*> & DHFrame::mutableFellows()
+{
+    return fellows_;
 }

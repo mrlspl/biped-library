@@ -60,12 +60,13 @@ DIST_COMMON = $(am__configure_deps) $(include_HEADERS) \
 	$(top_srcdir)/configure config.guess config.sub depcomp \
 	install-sh ltmain.sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/tools/m4/libtool.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/tools/m4/ax_check_compile_flag.m4 \
+	$(top_srcdir)/tools/m4/libtool.m4 \
 	$(top_srcdir)/tools/m4/ltoptions.m4 \
 	$(top_srcdir)/tools/m4/ltsugar.m4 \
 	$(top_srcdir)/tools/m4/ltversion.m4 \
 	$(top_srcdir)/tools/m4/lt~obsolete.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/tools/m4/stdcxx_11.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -103,13 +104,13 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libbarelibrary_la_LIBADD =
-am_libbarelibrary_la_OBJECTS = HelloWorld.lo
-libbarelibrary_la_OBJECTS = $(am_libbarelibrary_la_OBJECTS)
+libbipedlibrary_la_LIBADD =
+am_libbipedlibrary_la_OBJECTS = DHFrame.lo
+libbipedlibrary_la_OBJECTS = $(am_libbipedlibrary_la_OBJECTS)
 PROGRAMS = $(bin_PROGRAMS)
 nodist_testrunner_OBJECTS = main.$(OBJEXT)
 testrunner_OBJECTS = $(nodist_testrunner_OBJECTS)
-testrunner_DEPENDENCIES = libbarelibrary.la
+testrunner_DEPENDENCIES = libbipedlibrary.la
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -123,8 +124,8 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libbarelibrary_la_SOURCES) $(nodist_testrunner_SOURCES)
-DIST_SOURCES = $(libbarelibrary_la_SOURCES)
+SOURCES = $(libbipedlibrary_la_SOURCES) $(nodist_testrunner_SOURCES)
+DIST_SOURCES = $(libbipedlibrary_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -177,6 +178,7 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 GREP = @GREP@
+HAVE_CXX11 = @HAVE_CXX11@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -268,11 +270,11 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I tools/m4
 AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/tools/cxxtest
-lib_LTLIBRARIES = libbarelibrary.la
-libbarelibrary_la_SOURCES = src/HelloWorld.cpp
-include_HEADERS = include/HelloWorld.h
+lib_LTLIBRARIES = libbipedlibrary.la
+libbipedlibrary_la_SOURCES = src/DHFrame.cpp
+include_HEADERS = include/DHFrame.hpp include/Angle.hpp
 nodist_testrunner_SOURCES = unit-test/main.cpp
-testrunner_LDADD = libbarelibrary.la 
+testrunner_LDADD = libbipedlibrary.la 
 CLEANFILES = unit-test/main.cpp
 all: all-am
 
@@ -344,8 +346,8 @@ clean-libLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libbarelibrary.la: $(libbarelibrary_la_OBJECTS) $(libbarelibrary_la_DEPENDENCIES) $(EXTRA_libbarelibrary_la_DEPENDENCIES) 
-	$(CXXLINK) -rpath $(libdir) $(libbarelibrary_la_OBJECTS) $(libbarelibrary_la_LIBADD) $(LIBS)
+libbipedlibrary.la: $(libbipedlibrary_la_OBJECTS) $(libbipedlibrary_la_DEPENDENCIES) $(EXTRA_libbipedlibrary_la_DEPENDENCIES) 
+	$(CXXLINK) -rpath $(libdir) $(libbipedlibrary_la_OBJECTS) $(libbipedlibrary_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
@@ -402,7 +404,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HelloWorld.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHFrame.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 
 .cpp.o:
@@ -426,12 +428,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
 
-HelloWorld.lo: src/HelloWorld.cpp
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT HelloWorld.lo -MD -MP -MF $(DEPDIR)/HelloWorld.Tpo -c -o HelloWorld.lo `test -f 'src/HelloWorld.cpp' || echo '$(srcdir)/'`src/HelloWorld.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/HelloWorld.Tpo $(DEPDIR)/HelloWorld.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/HelloWorld.cpp' object='HelloWorld.lo' libtool=yes @AMDEPBACKSLASH@
+DHFrame.lo: src/DHFrame.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT DHFrame.lo -MD -MP -MF $(DEPDIR)/DHFrame.Tpo -c -o DHFrame.lo `test -f 'src/DHFrame.cpp' || echo '$(srcdir)/'`src/DHFrame.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/DHFrame.Tpo $(DEPDIR)/DHFrame.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='src/DHFrame.cpp' object='DHFrame.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o HelloWorld.lo `test -f 'src/HelloWorld.cpp' || echo '$(srcdir)/'`src/HelloWorld.cpp
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o DHFrame.lo `test -f 'src/DHFrame.cpp' || echo '$(srcdir)/'`src/DHFrame.cpp
 
 main.o: unit-test/main.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT main.o -MD -MP -MF $(DEPDIR)/main.Tpo -c -o main.o `test -f 'unit-test/main.cpp' || echo '$(srcdir)/'`unit-test/main.cpp
