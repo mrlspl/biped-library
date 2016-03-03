@@ -52,7 +52,11 @@ public:
         
         for(DHFrame* dhfp : fellows)
             delete dhfp;
-        
+    }
+    
+    void testIdGenarator()
+    {
+        TS_ASSERT_DIFFERS(DHFrame(), DHFrame());
     }
 };
 

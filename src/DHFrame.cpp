@@ -32,17 +32,29 @@
  */
 
 #include <stdexcept>
+#include <limits>
 
 #include "DHFrame.hpp"
+#include "unit-test/DHFrameTestSuite.h"
 
 using namespace BipedLibrary;
 
+unsigned DHFrame::lastGenaratedId_ = 0;
+
 DHFrame::DHFrame(Angle const alpha, Angle const theta, float const r, float const d) :
+id_(++lastGenaratedId_),
 theta_(theta),
 alpha_(alpha),
 r_(r),
 d_(d)
 {
+    if (lastGenaratedId_ == std::numeric_limits<unsigned>::max())
+        throw (std::out_of_range("Too many DHFrames constructed. Overflow on id"));
+}
+
+unsigned DHFrame::id() const
+{
+    return id_;
 }
 
 Angle DHFrame::theta() const
@@ -72,13 +84,11 @@ std::vector<DHFrame*> const& DHFrame::fellows() const
 
 DHFrame const* DHFrame::fellow(unsigned i) const
 {
-    try
-    {
+    try {
         return fellows_.at(i);
     }
-    catch(std::out_of_range &)
-    {
-        throw(std::out_of_range("Access to out of range fellow in DHFrame::fellow(unsinged)."));
+    catch (std::out_of_range &) {
+        throw (std::out_of_range("Access to out of range fellow in DHFrame::fellow(unsinged)."));
     }
 }
 
@@ -114,17 +124,24 @@ DHFrame& DHFrame::setFellows(std::vector<DHFrame*> const fellows)
 
 DHFrame * DHFrame::mutableFellow(unsigned const i)
 {
-    try
-    {
+    try {
         return fellows_.at(i);
     }
-    catch(std::out_of_range &)
-    {
-        throw(std::out_of_range("Access to out of range fellow in DHFrame::mutableFellow(unsinged)."));
+    catch (std::out_of_range &) {
+        throw (std::out_of_range("Access to out of range fellow in DHFrame::mutableFellow(unsinged)."));
     }
 }
 
 std::vector<DHFrame*> & DHFrame::mutableFellows()
 {
     return fellows_;
+}
+
+fvec3 DHFrame::posi_base_base(DHFrame const& base) const
+{
+}
+
+bool DHFrame::operator==(DHFrame const& other)
+{
+    return id_ == other.id_;
 }

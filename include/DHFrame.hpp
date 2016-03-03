@@ -34,17 +34,20 @@
 #pragma once
 
 #include <vector>
+#include <armadillo>
 
 #include "Angle.hpp"
 
 namespace BipedLibrary
 {
+    using namespace arma;
 
     class DHFrame
     {
     public:
         DHFrame(Angle const alpha = 0, Angle const theta = 0, float const r = 0, float const d = 0);
 
+        unsigned id() const;
         Angle theta() const;
         Angle alpha() const;
         float r() const;
@@ -60,8 +63,14 @@ namespace BipedLibrary
 
         DHFrame* mutableFellow(unsigned const i);
         std::vector<DHFrame*> & mutableFellows();
+        
+        fvec3 posi_base_base(DHFrame const& base) const;
+        
+        bool operator==(DHFrame const& other);
 
     private:
+        unsigned id_;
+        static unsigned lastGenaratedId_;
         Angle theta_;
         Angle alpha_;
         float r_;
