@@ -25,51 +25,37 @@
 
 
 /* 
- * File:   DHFrame.hpp
+ * File:   Chain.hpp
  * Author: <a href="a.sharpasand@mrl-spl.ir">Mohammad Ali Sharpasand</a>
  *
- * Created on February 29, 2016, 9:21 PM
+ * Created on March 17, 2016
  */
 
 #pragma once
+#include "DHFrame.hpp"
 
 #include <vector>
-#include <armadillo>
-
-#include "Angle.hpp"
 
 namespace BipedLibrary
 {
-    using namespace arma;
-
-    class DHFrame
+    
+    class Chain
     {
     public:
-        DHFrame(Angle const alpha = 0,
-                Angle const theta = 0,
-                float const r = 0,
-                float const d = 0);
-
-        unsigned id() const;
-        Angle theta() const;
-        Angle alpha() const;
-        float r() const;
-        float d() const;
-
-        DHFrame& setTheta(Angle const theta);
-        DHFrame& setAlpha(Angle const alpha);
-        DHFrame& setR(float const r);
-        DHFrame& setD(float const d);
+        Chain(fvec3 const posi_body_body = fvec3(),
+              fmat33 const ori_body = fmat33());
         
-        bool operator==(DHFrame const& other);
-
+        fvec3 const& posi_body_body() const;
+        fmat33 const& ori_body() const;
+        
+        Chain& setPosi_body_body(fvec3 const& posi_body_body);
+        Chain& setOri_body_body(fmat33 const& ori_body);
+        
     private:
-        unsigned id_;
-        static unsigned lastGenaratedId_;
-        Angle theta_;
-        Angle alpha_;
-        float r_;
-        float d_;
+        fvec3 posi_body_body_;
+        fmat33 ori_body_;
+        std::vector<DHFrame> chain_;
+
     };
 
 }

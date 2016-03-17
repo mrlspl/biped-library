@@ -77,21 +77,6 @@ float DHFrame::d() const
     return d_;
 }
 
-std::vector<DHFrame*> const& DHFrame::fellows() const
-{
-    return fellows_;
-}
-
-DHFrame const* DHFrame::fellow(unsigned i) const
-{
-    try {
-        return fellows_.at(i);
-    }
-    catch (std::out_of_range &) {
-        throw (std::out_of_range("Access to out of range fellow in DHFrame::fellow(unsinged)."));
-    }
-}
-
 DHFrame& DHFrame::setTheta(Angle const theta)
 {
     theta_ = theta;
@@ -114,31 +99,6 @@ DHFrame& DHFrame::setD(float const d)
 {
     d_ = d;
     return *this;
-}
-
-DHFrame& DHFrame::setFellows(std::vector<DHFrame*> const fellows)
-{
-    fellows_ = fellows;
-    return *this;
-}
-
-DHFrame * DHFrame::mutableFellow(unsigned const i)
-{
-    try {
-        return fellows_.at(i);
-    }
-    catch (std::out_of_range &) {
-        throw (std::out_of_range("Access to out of range fellow in DHFrame::mutableFellow(unsinged)."));
-    }
-}
-
-std::vector<DHFrame*> & DHFrame::mutableFellows()
-{
-    return fellows_;
-}
-
-fvec3 DHFrame::posi_base_base(DHFrame const& base) const
-{
 }
 
 bool DHFrame::operator==(DHFrame const& other)
