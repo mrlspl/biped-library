@@ -31,6 +31,12 @@ public:
         
         ch.setOri_body_body(ori_body);
         TS_ASSERT(all(all(ch.ori_body() == ori_body)));
+        
+        DHFrame dhf(0.1, 0.2, 3, 4);
+        ch.addDHFrame(dhf);
+        TS_ASSERT_EQUALS(ch.numOfDHFrames(), 1);
+        TS_ASSERT_EQUALS(ch.dHFrame(0), dhf);
+        TS_ASSERT_EQUALS(ch.mutableDHFrames().size(), size_t(1));
     }
 };
 

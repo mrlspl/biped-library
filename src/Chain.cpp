@@ -33,13 +33,16 @@
 
 #include "Chain.hpp"
 
+#include <stdexcept>
+#include <vector>
+
 using namespace BipedLibrary;
 
 Chain::Chain(fvec3 const posi_body_body, fmat33 const ori_body) :
 posi_body_body_(posi_body_body),
 ori_body_(ori_body)
 {
-    
+
 }
 
 fvec3 const& Chain::posi_body_body() const
@@ -52,6 +55,23 @@ fmat33 const& Chain::ori_body() const
     return ori_body_;
 }
 
+DHFrame const& Chain::dHFrame(unsigned i)
+{
+    try
+    {
+        return dHFrames_.at(i);
+    }
+    catch(std::out_of_range &)
+    {
+        throw(std::out_of_range("Index out of range in BipedLibrary::Chain::dHFrame(unsigned)"));
+    }
+}
+
+size_t Chain::numOfDHFrames()
+{
+    return dHFrames_.size();
+}
+
 Chain& Chain::setPosi_body_body(fvec3 const& posi_body_body)
 {
     posi_body_body_ = posi_body_body;
@@ -62,4 +82,37 @@ Chain& Chain::setOri_body_body(fmat33 const& ori_body)
 {
     ori_body_ = ori_body;
     return *this;
+}
+
+Chain& Chain::addDHFrame(DHFrame const dHframe)
+{
+    dHFrames_.push_back(dHframe);
+    return *this;
+}
+
+std::vector<DHFrame> & Chain::mutableDHFrames()
+{
+    return dHFrames_;
+}
+
+fvec3 Chain::posi_base_base(int i) const
+{
+    if(i == -1)
+        i = dHFrames_.size() - 1;
+    
+    if(i < 0 || (size_t)i >= dHFrames_.size())
+        throw(std::out_of_range("Index out of range in BipedLibrary::Chain::posi_base_base(int)"));
+    
+    // TODO: Implement recursive forward kinematics (for position) here.
+}
+
+fmat33 Chain::ori_base_base(int i) const
+{
+    if(i == -1)
+        i = dHFrames_.size() - 1;
+    
+    if(i < 0 || (size_t)i >= dHFrames_.size())
+        throw(std::out_of_range("Index out of range in BipedLibrary::Chain::ori_base_base(int)"));
+
+    // TODO: Implement recursive forward kinematics (for orientation) here.
 }

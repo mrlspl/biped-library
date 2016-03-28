@@ -47,14 +47,23 @@ namespace BipedLibrary
         
         fvec3 const& posi_body_body() const;
         fmat33 const& ori_body() const;
+        DHFrame const& dHFrame(unsigned i);
+        size_t numOfDHFrames();
         
         Chain& setPosi_body_body(fvec3 const& posi_body_body);
         Chain& setOri_body_body(fmat33 const& ori_body);
         
+        Chain& addDHFrame(DHFrame const dHframe);
+        
+        std::vector<DHFrame> & mutableDHFrames();
+        
+        fvec3 posi_base_base(int i = -1) const;
+        fmat33 ori_base_base(int i = -1) const;
+        
     private:
         fvec3 posi_body_body_;
         fmat33 ori_body_;
-        std::vector<DHFrame> chain_;
+        std::vector<DHFrame> dHFrames_;
 
     };
 
