@@ -32,6 +32,7 @@
  */
 
 #include "Chain.hpp"
+#include "Angle.hpp"
 
 #include <stdexcept>
 #include <vector>
@@ -95,24 +96,82 @@ std::vector<DHFrame> & Chain::mutableDHFrames()
     return dHFrames_;
 }
 
-fvec3 Chain::posi_base_base(int i) const
+fvec3 Chain::position_base_base(int frame) const
 {
-    if(i == -1)
-        i = dHFrames_.size() - 1;
+    fvec3 result;
+    if(frame == -1)
+        frame = dHFrames_.size() - 1;
     
-    if(i < 0 || (size_t)i >= dHFrames_.size())
-        throw(std::out_of_range("Index out of range in BipedLibrary::Chain::posi_base_base(int)"));
+    
+    if(frame < 0 || (size_t)frame >= dHFrames_.size())
+        throw(std::out_of_range("Index out of range in BipedLibrary::Chain::position_base_base(int)"));
     
     // TODO: Implement recursive forward kinematics (for position) here.
+    
+    if(frame==0)
+        return position_pre_pre(frame);
+    else
+    {
+        result = orientation_base(frame-1) * position_pre_pre(frame) + position_base_base(frame-1);
+        return result;
+    }
+    
+}
+fvec3 Chain::position_pre_pre(int i) const
+{
+	fvec3 output;
+
+	try
+	{
+		output << dHFrames_.at(i).r() << endr
+		       << -dHFrames_.at(i).d() * dHFrames_.at(i).alpha().sin() << endr
+		       << dHFrames_.at(i).d() * dHFrames_.at(i).alpha().cos() << endr;
+	}
+	catch(std::out_of_range &)
+	{
+		throw(std::out_of_range("Out of range index in Chain::position_pre_pre(int)."));
+	}
+	return output;
 }
 
-fmat33 Chain::ori_base_base(int i) const
+fmat33 Chain::orientation_base(int frame) const
 {
-    if(i == -1)
-        i = dHFrames_.size() - 1;
+    if(frame == -1)
+        frame = dHFrames_.size() - 1;
     
-    if(i < 0 || (size_t)i >= dHFrames_.size())
-        throw(std::out_of_range("Index out of range in BipedLibrary::Chain::ori_base_base(int)"));
+    if(frame < 0 || (size_t)frame >= dHFrames_.size())
+        throw(std::out_of_range("Index out of range in BipedLibrary::Chain::orientation_base(int)"));
 
     // TODO: Implement recursive forward kinematics (for orientation) here.
+
+    if (frame == 0)
+    	return orientation_pre(frame);
+        //return (conv_to<fmat>::from(eye(3,3)));
+    else
+    	return orientation_base(frame-1)*orientation_pre(frame);
+     
+    
 }
+fmat33 Chain::orientation_pre(int i) const
+{
+
+	fmat33 output;
+        Angle t,a;
+        t = dHFrames_.at(i).theta();
+        a = dHFrames_.at(i).alpha();
+        
+        try
+        {
+
+                output  << t.cos() << -(t.sin()) << 0 << endr
+	                << t.sin()*a.cos() << t.cos()*a.cos() << -(a.sin()) << endr
+	                << t.sin()*a.sin() << t.cos()*a.sin() << a.cos() << endr;
+        }
+        catch(std::out_of_range &)
+	{
+		throw(std::out_of_range("Out of range index in Chain::orientation_pre(int)."));
+	}
+	return output;
+
+	}
+

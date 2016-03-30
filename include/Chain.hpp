@@ -35,6 +35,7 @@
 #include "DHFrame.hpp"
 
 #include <vector>
+#include <armadillo>
 
 namespace BipedLibrary
 {
@@ -57,8 +58,11 @@ namespace BipedLibrary
         
         std::vector<DHFrame> & mutableDHFrames();
         
-        fvec3 posi_base_base(int i = -1) const;
-        fmat33 ori_base_base(int i = -1) const;
+        fvec3 position_base_base(int frame = -1) const;
+        fvec3 position_pre_pre(int i) const;
+        fmat33 orientation_base(int frame = -1) const;
+        fmat33 orientation_pre(int i) const;
+
         
     private:
         fvec3 posi_body_body_;
