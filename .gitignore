@@ -39,6 +39,7 @@ autom4te.cache
 .deps
 config.status
 config.log
+.dirstamp
 Makefile
 libtool
 

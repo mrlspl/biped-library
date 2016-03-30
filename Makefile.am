@@ -8,7 +8,7 @@ include_HEADERS = include/Chain.hpp include/DHFrame.hpp include/Angle.hpp
 
 bin_PROGRAMS = testrunner
 nodist_testrunner_SOURCES = unit-test/main.cpp
-testrunner_LDADD = libbipedlibrary.la 
+testrunner_LDADD = libbipedlibrary.la
 
 unit-test/main.cpp: unit-test/*.h
 	tools/cxxtest/bin/cxxtestgen --error-printer -o unit-test/main.cpp unit-test/*.h

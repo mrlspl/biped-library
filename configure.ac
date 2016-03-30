@@ -2,9 +2,10 @@ AC_CONFIG_MACRO_DIR([tools/m4])
 AC_PREREQ([2.69])
 AC_INIT([Biped-Library], [0.1], [m.a@sharpasand.com])
 LT_INIT([shared])
-AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_SRCDIR([src/DHFrame.cpp])
+AM_PROG_AR
 
 # Checks for programs.
 AC_PROG_CC
