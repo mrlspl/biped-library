@@ -43,30 +43,33 @@ namespace BipedLibrary
     class Chain
     {
     public:
-        Chain(fvec3 const posi_body_body = fvec3(),
-              fmat33 const ori_body = fmat33());
+        Chain(vec3 const posi_body_body = vec3(),
+              mat33 const ori_body = mat33());
         
-        fvec3 const& posi_body_body() const;
-        fmat33 const& ori_body() const;
+        vec3  posi_body_body(int frame) const;
+        mat33 const& ori_body() const;
         DHFrame const& dHFrame(unsigned i);
         size_t numOfDHFrames();
         
-        Chain& setPosi_body_body(fvec3 const& posi_body_body);
-        Chain& setOri_body_body(fmat33 const& ori_body);
+        Chain& setPosi_body_body(vec3 const& posi_body_body);
+        Chain& setOri_body(mat33 const& ori_body);
         
         Chain& addDHFrame(DHFrame const dHframe);
         
         std::vector<DHFrame> & mutableDHFrames();
         
-        fvec3 position_base_base(int frame = -1) const;
-        fvec3 position_pre_pre(int i) const;
-        fmat33 orientation_base(int frame = -1) const;
-        fmat33 orientation_pre(int i) const;
+        vec3 position_base_base(int frame = -1) const;
+        vec3 position_pre_pre(int i) const;
+        vec3 position_com (int frame) const;
+        mat33 orientation_base(int frame = -1) const;
+        mat33 orientation_pre(int i) const;
+        mat66 jacobi_base(int frame, bool com) const;
+        mat33 cpm (vec3 vector) const ;
 
         
     private:
-        fvec3 posi_body_body_;
-        fmat33 ori_body_;
+        vec3 posi_body_body_;
+        mat33 ori_body_;
         std::vector<DHFrame> dHFrames_;
 
     };
