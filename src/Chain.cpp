@@ -36,22 +36,23 @@
 
 #include <stdexcept>
 #include <vector>
+#include <armadillo>
 
 using namespace BipedLibrary;
 
-Chain::Chain(fvec3 const posi_body_body, fmat33 const ori_body) :
+Chain::Chain(vec3 const posi_body_body, mat33 const ori_body) :
 posi_body_body_(posi_body_body),
 ori_body_(ori_body)
 {
 
 }
 
-fvec3 const& Chain::posi_body_body() const
+vec3  Chain::posi_body_body(int frame) const
 {
-    return posi_body_body_;
+    return ori_body_ * position_base_base(frame) + posi_body_body_;
 }
 
-fmat33 const& Chain::ori_body() const
+mat33 const& Chain::ori_body() const
 {
     return ori_body_;
 }
@@ -73,13 +74,14 @@ size_t Chain::numOfDHFrames()
     return dHFrames_.size();
 }
 
-Chain& Chain::setPosi_body_body(fvec3 const& posi_body_body)
+Chain& Chain::setPosi_body_body(vec3 const& posi_body_body)
 {
+    
     posi_body_body_ = posi_body_body;
     return *this;
 }
 
-Chain& Chain::setOri_body_body(fmat33 const& ori_body)
+Chain& Chain::setOri_body(mat33 const& ori_body)
 {
     ori_body_ = ori_body;
     return *this;
@@ -96,15 +98,15 @@ std::vector<DHFrame> & Chain::mutableDHFrames()
     return dHFrames_;
 }
 
-fvec3 Chain::position_base_base(int frame) const
+vec3 Chain::position_base_base(int frame) const
 {
-    fvec3 result;
+    vec3 result;
     if(frame == -1)
         frame = dHFrames_.size() - 1;
-    
-    
+   
     if(frame < 0 || (size_t)frame >= dHFrames_.size())
         throw(std::out_of_range("Index out of range in BipedLibrary::Chain::position_base_base(int)"));
+    
     
     // TODO: Implement recursive forward kinematics (for position) here.
     
@@ -117,14 +119,14 @@ fvec3 Chain::position_base_base(int frame) const
     }
     
 }
-fvec3 Chain::position_pre_pre(int i) const
+vec3 Chain::position_pre_pre(int i) const
 {
-	fvec3 output;
+	vec3 output;
 
 	try
 	{
 		output << dHFrames_.at(i).r() << endr
-		       << -dHFrames_.at(i).d() * dHFrames_.at(i).alpha().sin() << endr
+		       << -1*dHFrames_.at(i).d() * dHFrames_.at(i).alpha().sin() << endr
 		       << dHFrames_.at(i).d() * dHFrames_.at(i).alpha().cos() << endr;
 	}
 	catch(std::out_of_range &)
@@ -134,7 +136,22 @@ fvec3 Chain::position_pre_pre(int i) const
 	return output;
 }
 
-fmat33 Chain::orientation_base(int frame) const
+vec3 Chain::position_com (int frame) const
+{
+    mat c;
+    c<< 0<<0<<0<<0<<0<<0<<endr
+     << 0<<0<<0<<0<<0<<0<<endr
+     << 0<<0<<0<<0<<0<<0<<endr;
+    
+    for(int i=0; i<=5; i++)
+    {
+        c(0,i) = dHFrames_.at(i).r() / 2;
+    }
+    
+    return c.col(frame);
+}
+
+mat33 Chain::orientation_base(int frame) const
 {
     if(frame == -1)
         frame = dHFrames_.size() - 1;
@@ -145,33 +162,81 @@ fmat33 Chain::orientation_base(int frame) const
     // TODO: Implement recursive forward kinematics (for orientation) here.
 
     if (frame == 0)
-    	return orientation_pre(frame);
-        //return (conv_to<fmat>::from(eye(3,3)));
+    {
+        mat33 temp = orientation_pre(frame);
+//        cout<<endl<<"R_0_0 : "<<endl<<temp<<endl;
+        return temp;
+    }
     else
-    	return orientation_base(frame-1)*orientation_pre(frame);
-     
+    {
+        mat33 temp = orientation_base(frame-1)*orientation_pre(frame);
+//        cout<<endl<<"R_frame_0 : "<<endl<<temp<<endl;
+        return temp;
+    }
     
 }
-fmat33 Chain::orientation_pre(int i) const
+
+mat33 Chain::orientation_pre(int i) const
 {
 
-	fmat33 output;
-        Angle t,a;
-        t = dHFrames_.at(i).theta();
-        a = dHFrames_.at(i).alpha();
+    mat33 output;
+    Angle t,a;
+    t = dHFrames_.at(i).theta();
+    a = dHFrames_.at(i).alpha();
         
-        try
-        {
+    try
+    {
+        output  << t.cos() << -(t.sin()) << 0 << endr
+                << t.sin()*a.cos() << t.cos()*a.cos() << -(a.sin()) << endr
+	        << t.sin()*a.sin() << t.cos()*a.sin() << a.cos() << endr;
+    }
+    catch(std::out_of_range &)
+    {
+        throw(std::out_of_range("Out of range index in Chain::orientation_pre(int)."));
+    }
+    
+    return output;
 
-                output  << t.cos() << -(t.sin()) << 0 << endr
-	                << t.sin()*a.cos() << t.cos()*a.cos() << -(a.sin()) << endr
-	                << t.sin()*a.sin() << t.cos()*a.sin() << a.cos() << endr;
-        }
-        catch(std::out_of_range &)
-	{
-		throw(std::out_of_range("Out of range index in Chain::orientation_pre(int)."));
-	}
-	return output;
+}
 
-	}
+mat66 Chain::jacobi_base(int frame, bool com) const
+{
+    mat66 jacobi={0,0,0,0,0,0,
+                   0,0,0,0,0,0,
+                   0,0,0,0,0,0,
+                   0,0,0,0,0,0,
+                   0,0,0,0,0,0,
+                   0,0,0,0,0,0};
+    vec3 z_i_base={0, 0, 0};
+    vec3 matrix={0, 0, 1};
+    vec3 r_frame_i_base;
+    vec3 temp;
+    for (int i=0; i<=frame; i++)
+    {
+        z_i_base = orientation_base(i)*matrix;
+//        std::cout << "z_i_base" << z_i_base << std::endl;
+        r_frame_i_base = position_base_base(frame) - position_base_base(i);
+//        std::cout << "r_frame_i_base" << r_frame_i_base << std::endl;
+        if(com==1)
+            r_frame_i_base = r_frame_i_base + (orientation_base(frame) * position_com(i));
+        //jacobi.col(i)={cpm(z_i_base) * r_frame_i_base, r_frame_i_base};
+//        std::cout << "cpm(z_i_base)" << cpm(z_i_base) << std::endl;
+        temp = cpm(z_i_base) * r_frame_i_base;
+        for(int j=0; j<=2; j++)
+            jacobi(j,i) = temp(j);  
+        for(int j=0; j<=2; j++)
+            jacobi(j+3,i) = z_i_base(j);
+    }
+    return jacobi;
+}
 
+mat33 Chain::cpm (vec3 vector) const 
+{
+    mat33   cpm_vector;
+    cpm_vector << 0 << -1*vector(2) << vector(1)<< endr
+               << vector(2) << 0 << -1*vector(0) << endr
+               << -1*vector(1) << vector(0) << 0 << endr;
+    return cpm_vector;
+
+    
+}
