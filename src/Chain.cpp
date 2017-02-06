@@ -107,48 +107,34 @@ vec3 Chain::position_base_base(int frame) const
     if(frame < 0 || (size_t)frame >= dHFrames_.size())
         throw(std::out_of_range("Index out of range in BipedLibrary::Chain::position_base_base(int)"));
     
-    
-    // TODO: Implement recursive forward kinematics (for position) here.
-    
-    if(frame==0)
+    if(frame == 0)
         return position_pre_pre(frame);
-    else
-    {
-        result = orientation_base(frame-1) * position_pre_pre(frame) + position_base_base(frame-1);
-        return result;
-    }
     
+    return orientation_base(frame-1) * position_pre_pre(frame) + position_base_base(frame-1);
 }
+
 vec3 Chain::position_pre_pre(int i) const
 {
-	vec3 output;
+    vec3 output;
 
-	try
-	{
-		output << dHFrames_.at(i).r() << endr
-		       << -1*dHFrames_.at(i).d() * dHFrames_.at(i).alpha().sin() << endr
-		       << dHFrames_.at(i).d() * dHFrames_.at(i).alpha().cos() << endr;
-	}
-	catch(std::out_of_range &)
-	{
-		throw(std::out_of_range("Out of range index in Chain::position_pre_pre(int)."));
-	}
-	return output;
-}
-
-vec3 Chain::position_com (int frame) const
-{
-    mat c;
-    c<< 0<<0<<0<<0<<0<<0<<endr
-     << 0<<0<<0<<0<<0<<0<<endr
-     << 0<<0<<0<<0<<0<<0<<endr;
-    
-    for(int i=0; i<=5; i++)
+    try
     {
-        c(0,i) = dHFrames_.at(i).r() / 2;
+        output << dHFrames_.at(i).r() << endr
+               << -1*dHFrames_.at(i).d() * dHFrames_.at(i).alpha().sin() << endr
+               << dHFrames_.at(i).d() * dHFrames_.at(i).alpha().cos() << endr;
+    }
+    catch(std::out_of_range &)
+    {
+        throw(std::out_of_range("Out of range index in Chain::position_pre_pre(int)."));
     }
     
-    return c.col(frame);
+    return output;
+}
+
+vec3 Chain::position_com(int frame) const
+{
+    // FIXME: This is not actually COM! Be warned!
+    return vec3(dHFrames_.at(frame).r() / 2, 0, 0);
 }
 
 mat33 Chain::orientation_base(int frame) const
