@@ -134,7 +134,7 @@ vec3 Chain::position_pre_pre(int i) const
 vec3 Chain::position_com(int frame) const
 {
     // FIXME: This is not actually COM! Be warned!
-    return vec3(dHFrames_.at(frame).r() / 2, 0, 0);
+    return vec3({dHFrames_.at(frame).r() / 2.f, 0.f, 0.f});
 }
 
 mat33 Chain::orientation_base(int frame) const
