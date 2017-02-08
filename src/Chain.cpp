@@ -47,7 +47,7 @@ ori_body_(ori_body)
 
 }
 
-vec3  Chain::posi_body_body(int frame) const
+vec3 Chain::posi_body_body(int frame) const
 {
     return ori_body_ * position_base_base(frame) + posi_body_body_;
 }

@@ -25,7 +25,7 @@
 
 
 /* 
- * File:   Body.hpp
+ * File:   Humanoid.hpp
  * Author: <a href="a.sharpasand@mrl-spl.ir">Mohammad Ali Sharpasand</a>
  *
  * Created on March 17, 2016
@@ -33,21 +33,35 @@
 
 #pragma once
 
-#include "Chain.hpp"
+#include "Biped.hpp"
 
 #include <vector>
 
 namespace BipedLibrary
 {
 
-    class Body
+    class Humanoid : public Biped
     {
     public:
-        Body();
-
+        Humanoid();
+        
+        Chain leftHand() const;
+        Chain rightHand() const;
+        Chain head() const;
+        
+        Humanoid& setLeftHand(Chain const& leftHand);
+        Humanoid& setRightHand(Chain const& rightHand);
+        Humanoid& setHead(Chain const& head);
+        
+        Chain& mutableLeftHand();
+        Chain& mutableRightHand();
+        Chain& mutableHead();
+        
     private:
-        std::vector<Chain> chains_;
-
+        Chain leftHand_;
+        Chain rightHand_;
+        Chain head_;
+        
     };
 
 }

@@ -25,16 +25,39 @@
 
 
 /* 
- * File:   Body.cpp
+ * File:   Biped.hpp
  * Author: <a href="a.sharpasand@mrl-spl.ir">Mohammad Ali Sharpasand</a>
  *
- * Created on March 17, 2016
+ * Created on February 8, 2017
  */
 
-#include "Body.hpp"
+#pragma once
 
-using namespace BipedLibrary;
+#include "Chain.hpp"
 
-Body::Body() {
+#include <vector>
+
+namespace BipedLibrary
+{
+
+    class Biped
+    {
+    public:
+        Biped();
+        
+        Chain leftLeg() const;
+        Chain rightLeg() const;
+        
+        Biped& setLeftLeg(Chain const& leftLeg);
+        Biped& setRightLeg(Chain const& rightLeg);
+
+        Chain& mutableLeftLeg();
+        Chain& mutableRightLeg();
+        
+    private:
+        Chain leftLeg_;
+        Chain rightLeg_;
+
+    };
+
 }
-
