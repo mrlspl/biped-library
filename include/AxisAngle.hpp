@@ -25,52 +25,44 @@
 
 
 /* 
- * File:   Chain.hpp
+ * File:   AxisAngle.hpp
  * Author: <a href="a.sharpasand@mrl-spl.ir">Mohammad Ali Sharpasand</a>
  *
- * Created on March 17, 2016
+ * Created on February 22, 2017
  */
 
-#pragma once
-#include "DHFrame.hpp"
+#ifndef BIPED_LIBRARY_AXIS_ANGLE_H
+#define BIPED_LIBRARY_AXIS_ANGLE_H
 
-#include <vector>
+#include "Angle.hpp"
 #include <armadillo>
 
 namespace BipedLibrary
 {
     using namespace arma;
-    
-    class Chain
+
+    class AxisAngle
     {
     public:
-        Chain(vec3 const posi_body_body = vec3(),
-              mat33 const ori_body = mat33());
+        AxisAngle(vec3 axis = vec3(), Angle angle = Angle());
         
-        vec3  posi_body_body(int frame) const;
-        mat33 const& ori_body() const;
-        DHFrame const& dHFrame(unsigned i);
-        size_t numOfDHFrames();
+        mat33 rotationMatrix();
         
-        Chain& setPosi_body_body(vec3 const& posi_body_body);
-        Chain& setOri_body(mat33 const& ori_body);
+        vec3 axis() const;
+        Angle angle() const;
         
-        Chain& addDHFrame(DHFrame const dHframe);
+        AxisAngle& setAxis(vec3 const& axis);
+        AxisAngle& setAngle(Angle const& angle);
         
-        std::vector<DHFrame> & mutableDHFrames();
-        
-        vec3 position_base_base(int frame = -1) const;
-        vec3 position_pre_pre(int i) const;
-        vec3 position_com (int frame) const;
-        mat33 orientation_base(int frame = -1) const;
-        mat33 orientation_pre(int i) const;
-        mat66 jacobi_base(int frame, bool com) const;
-        
+        vec3& mutableAxis();
+        Angle& mutableAngle();
+    
     private:
-        vec3 posi_body_body_;
-        mat33 ori_body_;
-        std::vector<DHFrame> dHFrames_;
-
+        vec3 axis_;
+        Angle angle_;
+    
     };
 
 }
+
+#endif

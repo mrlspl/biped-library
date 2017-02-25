@@ -33,12 +33,14 @@
 
 #include "Chain.hpp"
 #include "Angle.hpp"
+#include "Utility.hpp"
 
 #include <stdexcept>
 #include <vector>
 #include <armadillo>
 
 using namespace BipedLibrary;
+using namespace BipedLibrary::Utility;
 
 Chain::Chain(vec3 const posi_body_body, mat33 const ori_body) :
 posi_body_body_(posi_body_body),
@@ -207,22 +209,11 @@ mat66 Chain::jacobi_base(int frame, bool com) const
             r_frame_i_base = r_frame_i_base + (orientation_base(frame) * position_com(i));
         //jacobi.col(i)={cpm(z_i_base) * r_frame_i_base, r_frame_i_base};
 //        std::cout << "cpm(z_i_base)" << cpm(z_i_base) << std::endl;
-        temp = cpm(z_i_base) * r_frame_i_base;
+        temp = crossProductMatrix(z_i_base) * r_frame_i_base;
         for(int j=0; j<=2; j++)
             jacobi(j,i) = temp(j);  
         for(int j=0; j<=2; j++)
             jacobi(j+3,i) = z_i_base(j);
     }
     return jacobi;
-}
-
-mat33 Chain::cpm (vec3 vector) const 
-{
-    mat33   cpm_vector;
-    cpm_vector << 0 << -1*vector(2) << vector(1)<< endr
-               << vector(2) << 0 << -1*vector(0) << endr
-               << -1*vector(1) << vector(0) << 0 << endr;
-    return cpm_vector;
-
-    
 }

@@ -131,10 +131,10 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(pkgincludedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libbipedlibrary_la_LIBADD =
+libbipedlibrary_la_DEPENDENCIES =
 am__dirstamp = $(am__leading_dot)dirstamp
 am_libbipedlibrary_la_OBJECTS = src/Chain.lo src/DHFrame.lo \
-	src/Biped.lo src/Humanoid.lo
+	src/Biped.lo src/Humanoid.lo src/AxisAngle.lo src/Utility.lo
 libbipedlibrary_la_OBJECTS = $(am_libbipedlibrary_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -345,19 +345,23 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I tools/m4
-AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/tools/cxxtest
+AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/src -I$(top_srcdir)/tools/cxxtest
 lib_LTLIBRARIES = libbipedlibrary.la
 libbipedlibrary_la_SOURCES = src/Chain.cpp \
                              src/DHFrame.cpp \
                              src/Biped.cpp \
-                             src/Humanoid.cpp
+                             src/Humanoid.cpp \
+			     src/AxisAngle.cpp \
+			     src/Utility.cpp
 
 pkginclude_HEADERS = include/Chain.hpp \
                      include/DHFrame.hpp \
                      include/Angle.hpp \
                      include/Biped.hpp \
-                     include/Humanoid.hpp
+                     include/Humanoid.hpp \
+		     include/AxisAngle.hpp
 
+libbipedlibrary_la_LIBADD = -larmadillo
 nodist_testrunner_SOURCES = unit-test/main.cpp
 testrunner_LDADD = libbipedlibrary.la
 CLEANFILES = unit-test/main.cpp
@@ -444,6 +448,8 @@ src/Chain.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/DHFrame.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Biped.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 src/Humanoid.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/AxisAngle.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
+src/Utility.lo: src/$(am__dirstamp) src/$(DEPDIR)/$(am__dirstamp)
 
 libbipedlibrary.la: $(libbipedlibrary_la_OBJECTS) $(libbipedlibrary_la_DEPENDENCIES) $(EXTRA_libbipedlibrary_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(CXXLINK) -rpath $(libdir) $(libbipedlibrary_la_OBJECTS) $(libbipedlibrary_la_LIBADD) $(LIBS)
@@ -518,10 +524,12 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/AxisAngle.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Biped.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Chain.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/DHFrame.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Humanoid.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/Utility.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@unit-test/$(DEPDIR)/main.Po@am__quote@
 
 .cpp.o:

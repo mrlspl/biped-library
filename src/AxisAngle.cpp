@@ -25,52 +25,59 @@
 
 
 /* 
- * File:   Chain.hpp
+ * File:   AxisAngle.cpp
  * Author: <a href="a.sharpasand@mrl-spl.ir">Mohammad Ali Sharpasand</a>
  *
- * Created on March 17, 2016
+ * Created on February 22, 2016
  */
 
-#pragma once
-#include "DHFrame.hpp"
+#include "AxisAngle.hpp"
+#include "Utility.hpp"
 
-#include <vector>
-#include <armadillo>
+using namespace BipedLibrary;
+using namespace BipedLibrary::Utility;
 
-namespace BipedLibrary
+AxisAngle::AxisAngle(vec3 axis, Angle angle) :
+axis_(axis),
+angle_(angle)
 {
-    using namespace arma;
-    
-    class Chain
-    {
-    public:
-        Chain(vec3 const posi_body_body = vec3(),
-              mat33 const ori_body = mat33());
-        
-        vec3  posi_body_body(int frame) const;
-        mat33 const& ori_body() const;
-        DHFrame const& dHFrame(unsigned i);
-        size_t numOfDHFrames();
-        
-        Chain& setPosi_body_body(vec3 const& posi_body_body);
-        Chain& setOri_body(mat33 const& ori_body);
-        
-        Chain& addDHFrame(DHFrame const dHframe);
-        
-        std::vector<DHFrame> & mutableDHFrames();
-        
-        vec3 position_base_base(int frame = -1) const;
-        vec3 position_pre_pre(int i) const;
-        vec3 position_com (int frame) const;
-        mat33 orientation_base(int frame = -1) const;
-        mat33 orientation_pre(int i) const;
-        mat66 jacobi_base(int frame, bool com) const;
-        
-    private:
-        vec3 posi_body_body_;
-        mat33 ori_body_;
-        std::vector<DHFrame> dHFrames_;
+}
 
-    };
+mat33 AxisAngle::rotationMatrix()
+{
+    vec3 u = normalise(axis_);
+    return angle_.cos() * eye(3, 3) + angle_.sin() * crossProductMatrix(u)
+           + (1 - angle_.cos()) * u * u.t();
+}
 
+vec3 AxisAngle::axis() const
+{
+    return axis_;
+}
+
+Angle AxisAngle::angle() const
+{
+    return angle_;
+}
+
+AxisAngle& AxisAngle::setAxis(vec3 const& axis)
+{
+    axis_ = axis;
+    return *this;
+}
+
+AxisAngle& AxisAngle::setAngle(Angle const& angle)
+{
+    angle_ = angle;
+    return *this;
+}
+
+vec3& AxisAngle::mutableAxis()
+{
+    return axis_;
+}
+
+Angle& AxisAngle::mutableAngle()
+{
+    return angle_;
 }

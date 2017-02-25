@@ -28,7 +28,7 @@
  * File:   DHFrame.cpp
  * Author: <a href="a.sharpasand@mrl-spl.ir">Mohammad Ali Sharpasand</a>
  * 
- * Created on February 29, 2016, 9:21 PM
+ * Created on February 29, 2016
  */
 
 #include <stdexcept>
