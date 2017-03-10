@@ -11,6 +11,7 @@
 #pragma once
 
 #include <cmath>
+#include <stdexcept>
 
 namespace BipedLibrary
 {
@@ -64,8 +65,15 @@ namespace BipedLibrary
 
         friend Angle operator/(Angle first, Angle second)
         {
+        	if (second == 0)
+        	{
+        		throw "division by zero condition!!";
+
+        	}
+
             return Angle(first._data / second._data);
         }
+
 
         Angle operator+=(Angle other)
         {
