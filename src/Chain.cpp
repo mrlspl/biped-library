@@ -59,21 +59,13 @@ mat33 const& Chain::ori_body() const
     return ori_body_;
 }
 
-DHFrame const& Chain::dHFrame(unsigned i)
+vec3 Chain::posi_end_last_last() const
 {
-    try
-    {
-        return dHFrames_.at(i);
-    }
-    catch(std::out_of_range &)
-    {
-        throw(std::out_of_range("Index out of range in BipedLibrary::Chain::dHFrame(unsigned)"));
-    }
+	return posi_end_last_last_;
 }
-
-size_t Chain::numOfDHFrames()
+mat33 Chain::ori_end_last() const
 {
-    return dHFrames_.size();
+	return ori_end_last_;
 }
 
 Chain& Chain::setPosi_body_body(vec3 const& posi_body_body)
@@ -89,30 +81,36 @@ Chain& Chain::setOri_body(mat33 const& ori_body)
     return *this;
 }
 
-Chain& Chain::addDHFrame(DHFrame const dHframe)
+Chain& Chain::setPosi_end_last_last(vec3 const& posi_end_last_last)
 {
-    dHFrames_.push_back(dHframe);
-    return *this;
+	posi_end_last_last_ = posi_end_last_last;
+	return *this;
 }
 
-std::vector<DHFrame> & Chain::mutableDHFrames()
+Chain& Chain::setOri_end_last(mat33 const& ori_end_last)
 {
-    return dHFrames_;
+	ori_end_last_ = ori_end_last;
+	return *this;
+}
+
+vec3 Chain::position_end_base_base() const
+{
+	mat33 const ori_last_base = orientation_base();
+	return position_base_base() + ori_last_base * posi_end_last_last_;
 }
 
 vec3 Chain::position_base_base(int frame) const
 {
-    vec3 result;
     if(frame == -1)
-        frame = dHFrames_.size() - 1;
+        frame = size() - 1;
    
-    if(frame < 0 || (size_t)frame >= dHFrames_.size())
+    if(frame < 0 || (size_t)frame >= size())
         throw(std::out_of_range("Index out of range in BipedLibrary::Chain::position_base_base(int)"));
     
     if(frame == 0)
         return position_pre_pre(frame);
     
-    return orientation_base(frame-1) * position_pre_pre(frame) + position_base_base(frame-1);
+    return position_base_base(frame - 1) + orientation_base(frame - 1) * position_pre_pre(frame);
 }
 
 vec3 Chain::position_pre_pre(int i) const
@@ -121,9 +119,9 @@ vec3 Chain::position_pre_pre(int i) const
 
     try
     {
-        output << dHFrames_.at(i).r() << endr
-               << -1*dHFrames_.at(i).d() * dHFrames_.at(i).alpha().sin() << endr
-               << dHFrames_.at(i).d() * dHFrames_.at(i).alpha().cos() << endr;
+        output <<   at(i).r()                       << endr
+               << - at(i).d() * at(i).alpha().sin() << endr
+               <<   at(i).d() * at(i).alpha().cos() << endr;
     }
     catch(std::out_of_range &)
     {
@@ -136,47 +134,42 @@ vec3 Chain::position_pre_pre(int i) const
 vec3 Chain::position_com(int frame) const
 {
     // FIXME: This is not actually COM! Be warned!
-    return vec3({dHFrames_.at(frame).r() / 2.f, 0.f, 0.f});
+    return vec3({at(frame).r() / 2.f, 0.f, 0.f});
+}
+
+mat33 Chain::orientation_end_base() const
+{
+	return orientation_base() * ori_end_last_;
 }
 
 mat33 Chain::orientation_base(int frame) const
 {
     if(frame == -1)
-        frame = dHFrames_.size() - 1;
+        frame = size() - 1;
     
-    if(frame < 0 || (size_t)frame >= dHFrames_.size())
+    if(frame < 0 || (size_t)frame >= size())
         throw(std::out_of_range("Index out of range in BipedLibrary::Chain::orientation_base(int)"));
 
-    // TODO: Implement recursive forward kinematics (for orientation) here.
-
     if (frame == 0)
-    {
-        mat33 temp = orientation_pre(frame);
-//        cout<<endl<<"R_0_0 : "<<endl<<temp<<endl;
-        return temp;
-    }
+        return orientation_pre(frame);
     else
-    {
-        mat33 temp = orientation_base(frame-1)*orientation_pre(frame);
-//        cout<<endl<<"R_frame_0 : "<<endl<<temp<<endl;
-        return temp;
-    }
+        return orientation_base(frame-1) * orientation_pre(frame);
     
 }
 
+// TODO: This should be in DHFrame class
 mat33 Chain::orientation_pre(int i) const
 {
-
     mat33 output;
-    Angle t,a;
-    t = dHFrames_.at(i).theta();
-    a = dHFrames_.at(i).alpha();
-        
+    Angle theta,alpha;
+    theta = at(i).theta();
+    alpha = at(i).alpha();
+
     try
     {
-        output  << t.cos() << -(t.sin()) << 0 << endr
-                << t.sin()*a.cos() << t.cos()*a.cos() << -(a.sin()) << endr
-	        << t.sin()*a.sin() << t.cos()*a.sin() << a.cos() << endr;
+        output  << theta.cos()               << -theta.sin()              << 0            << endr
+                << theta.sin() * alpha.cos() << theta.cos() * alpha.cos() << -alpha.sin() << endr
+	            << theta.sin() * alpha.sin() << theta.cos() * alpha.sin() <<  alpha.cos() << endr;
     }
     catch(std::out_of_range &)
     {

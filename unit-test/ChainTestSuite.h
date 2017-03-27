@@ -23,17 +23,17 @@ public:
         p = datum::pi;
 //----------------data88-----------------------
         DHFrame dhf(0,0.0020,45.11,0);
-        ch.addDHFrame(dhf);
+        ch.push_back(dhf);
         dhf = DHFrame(p/2,-0.3702,0,0);
-        ch.addDHFrame(dhf);
+        ch.push_back(dhf);
         dhf = DHFrame(0,0.4940,102.75,0);
-        ch.addDHFrame(dhf);
+        ch.push_back(dhf);
         dhf = DHFrame(0,-0.1238,100.0,0);
-        ch.addDHFrame(dhf);
+        ch.push_back(dhf);
         dhf = DHFrame(-p/2,-0.0016+(p/4),0,0);
-        ch.addDHFrame(dhf);
+        ch.push_back(dhf);
         dhf = DHFrame(p/2,0.0100,0,0);
-        ch.addDHFrame(dhf); 
+        ch.push_back(dhf);
 
         
     }
@@ -58,10 +58,10 @@ public:
     
     void testSetAndGet()
     {
-        vec3 const posi_body_body = {0, 0, 0};
+        vec3 const posi_body_body = {1, 2, 3};
         vec3 const result={2.4013e+02, 3.9005e-01, -2.4827e+01};  ///data88
 //        vec3 const result={239.0377 , -4.3279 , -8.2007 };  ///data200
-        mat33 const ori_body = {1,0,0,0,1,0,0,0,1};
+        mat33 const ori_body = {3,2,1,1,2,3,4,5,1};
         
 
         ch.setOri_body(ori_body);
@@ -69,6 +69,9 @@ public:
         
         ch.setPosi_body_body(posi_body_body);
         TS_ASSERT_EQUALS(all(ch.posi_body_body(5)),all(result));
+
+        ch.setOri_end_last(ori_body);
+        TS_ASSERT(all(all(ch.ori_end_last() == ori_body)));
         
 //        DHFrame dhf(0.1, 0.2, 3, 4);
 //        ch.addDHFrame(dhf);

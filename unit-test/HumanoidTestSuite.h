@@ -14,26 +14,26 @@ public:
 {
         Humanoid humanoid;
         Chain myChain;
-        myChain.addDHFrame(DHFrame());
+        myChain.push_back(DHFrame());
         humanoid.setLeftHand(myChain);
-        TS_ASSERT_EQUALS(humanoid.leftHand().numOfDHFrames(), 1);
+        TS_ASSERT_EQUALS(humanoid.leftHand().size(), 1);
 
-        myChain.addDHFrame(DHFrame());
+        myChain.push_back(DHFrame());
         humanoid.setRightHand(myChain);
-        TS_ASSERT_EQUALS(humanoid.rightHand().numOfDHFrames(), 2);
+        TS_ASSERT_EQUALS(humanoid.rightHand().size(), 2);
 
-        myChain.addDHFrame(DHFrame());
+        myChain.push_back(DHFrame());
         humanoid.setHead(myChain);
-        TS_ASSERT_EQUALS(humanoid.head().numOfDHFrames(), 3);
+        TS_ASSERT_EQUALS(humanoid.head().size(), 3);
 
-        humanoid.mutableLeftHand().addDHFrame(DHFrame());
-        TS_ASSERT_EQUALS(humanoid.leftHand().numOfDHFrames(), 2);
+        humanoid.mutableLeftHand().push_back(DHFrame());
+        TS_ASSERT_EQUALS(humanoid.leftHand().size(), 2);
 
-        humanoid.mutableRightHand().addDHFrame(DHFrame());
-        TS_ASSERT_EQUALS(humanoid.rightHand().numOfDHFrames(), 3);
+        humanoid.mutableRightHand().push_back(DHFrame());
+        TS_ASSERT_EQUALS(humanoid.rightHand().size(), 3);
 
-        humanoid.mutableHead().addDHFrame(DHFrame());
-        TS_ASSERT_EQUALS(humanoid.head().numOfDHFrames(), 4);
+        humanoid.mutableHead().push_back(DHFrame());
+        TS_ASSERT_EQUALS(humanoid.head().size(), 4);
     }
 };
 

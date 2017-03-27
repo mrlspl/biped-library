@@ -14,13 +14,13 @@ public:
     {
         Biped biped;
         Chain myChain;
-        myChain.addDHFrame(DHFrame());
+        myChain.push_back(DHFrame());
         biped.setLeftLeg(myChain);
-        TS_ASSERT_EQUALS(biped.leftLeg().numOfDHFrames(), 1);
+        TS_ASSERT_EQUALS(biped.leftLeg().size(), 1);
         
-        myChain.addDHFrame(DHFrame());
+        myChain.push_back(DHFrame());
         biped.setRightLeg(myChain);
-        TS_ASSERT_EQUALS(biped.rightLeg().numOfDHFrames(), 2);
+        TS_ASSERT_EQUALS(biped.rightLeg().size(), 2);
     }
 };
 

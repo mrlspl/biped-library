@@ -41,27 +41,27 @@ namespace BipedLibrary
 {
     using namespace arma;
     
-    class Chain
+    class Chain : public std::vector<DHFrame>
     {
     public:
         Chain(vec3 const posi_body_body = vec3(),
               mat33 const ori_body = mat33());
         
-        vec3  posi_body_body(int frame) const;
+        vec3 posi_body_body(int frame) const;
         mat33 const& ori_body() const;
-        DHFrame const& dHFrame(unsigned i);
-        size_t numOfDHFrames();
+        vec3 posi_end_last_last() const;
+        mat33 ori_end_last() const;
         
         Chain& setPosi_body_body(vec3 const& posi_body_body);
         Chain& setOri_body(mat33 const& ori_body);
+        Chain& setPosi_end_last_last(vec3 const& posi_end_last_last);
+        Chain& setOri_end_last(mat33 const& ori_end_last);
         
-        Chain& addDHFrame(DHFrame const dHframe);
-        
-        std::vector<DHFrame> & mutableDHFrames();
-        
+        vec3 position_end_base_base() const;
         vec3 position_base_base(int frame = -1) const;
         vec3 position_pre_pre(int i) const;
         vec3 position_com (int frame) const;
+        mat33 orientation_end_base() const;
         mat33 orientation_base(int frame = -1) const;
         mat33 orientation_pre(int i) const;
         mat66 jacobi_base(int frame, bool com) const;
@@ -69,7 +69,8 @@ namespace BipedLibrary
     private:
         vec3 posi_body_body_;
         mat33 ori_body_;
-        std::vector<DHFrame> dHFrames_;
+        vec3 posi_end_last_last_;
+        mat33 ori_end_last_;
 
     };
 
