@@ -57,11 +57,11 @@ namespace BipedLibrary
         Chain& setPosi_end_last_last(vec3 const& posi_end_last_last);
         Chain& setOri_end_last(mat33 const& ori_end_last);
         
-        vec3 position_end_base_base() const;
+        vec3 position_end_body_body() const;
         vec3 position_base_base(int frame = -1) const;
         vec3 position_pre_pre(int i) const;
         vec3 position_com (int frame) const;
-        mat33 orientation_end_base() const;
+        mat33 orientation_end_body() const;
         mat33 orientation_base(int frame = -1) const;
         mat33 orientation_pre(int i) const;
         mat66 jacobi_base(int frame, bool com) const;

@@ -93,10 +93,11 @@ Chain& Chain::setOri_end_last(mat33 const& ori_end_last)
 	return *this;
 }
 
-vec3 Chain::position_end_base_base() const
+vec3 Chain::position_end_body_body() const
 {
 	mat33 const ori_last_base = orientation_base();
-	return position_base_base() + ori_last_base * posi_end_last_last_;
+	vec3 const posi_end_base_base = position_base_base() + ori_last_base * posi_end_last_last_;
+	return posi_body_body_ + ori_body_ * posi_end_base_base;
 }
 
 vec3 Chain::position_base_base(int frame) const
@@ -137,9 +138,9 @@ vec3 Chain::position_com(int frame) const
     return vec3({at(frame).r() / 2.f, 0.f, 0.f});
 }
 
-mat33 Chain::orientation_end_base() const
+mat33 Chain::orientation_end_body() const
 {
-	return orientation_base() * ori_end_last_;
+	return ori_body_ * orientation_base() * ori_end_last_;
 }
 
 mat33 Chain::orientation_base(int frame) const
