@@ -4,6 +4,7 @@
 #include <armadillo>
 #include <iostream>
 #include "../include/Chain.hpp"
+#include "../src/Utility.hpp"
 
 using namespace BipedLibrary;
 
@@ -96,7 +97,61 @@ public:
               << 0 << -1 << -1 << -1 << 0 << -0.7069 << endr
               << 1 << 0 << 0 << 0 << 1 << 0 << endr;
              
-       TS_ASSERT_LESS_THAN(max(abs(all(all(ch.jacobi_base(5,0) - jacob)))), 0.01);
+       TS_ASSERT_LESS_THAN(max(abs(all(all(ch.jacobi_base(5) - jacob)))), 0.01);
+    }
+
+    void testJacobian()
+    {
+    	arma_rng::set_seed_random();
+
+    	vec3 const initialPosi = ch.position_end_body_body();
+    	mat33 const initialOri = ch.orientation_body();
+    	mat66 const initialJacobi = ch.jacobi_body(5, ch.posi_end_last_last());
+
+    	vec6 const perturbation = randu(6, 1) * 0.01;
+    	int i = 0;
+    	for(DHFrame & frame : ch)
+    	{
+    		frame.setTheta(frame.theta() + perturbation(i));
+			i++;
+    	}
+
+    	vec3 const newPosi = ch.position_end_body_body();
+    	mat33 const newOri = ch.orientation_body();
+
+    	i = 0;
+    	for(DHFrame & frame : ch)
+		{
+			frame.setTheta(frame.theta() - 2 * perturbation(i));
+			i++;
+		}
+
+    	vec3 const newPosi2 = ch.position_end_body_body();
+    	mat33 const newOri2 = ch.orientation_body();
+
+    	vec3 const deltaPosi = (newPosi - newPosi2) / 2;
+    	vec3 const diffPosi  = initialJacobi(span(0, 2), span::all) * perturbation;
+    	mat33 const deltaOri = (newOri * newOri2.t() + eye(3, 3)) / 2;
+    	vec3 const rotationVector = initialJacobi(span(3, 5), span::all) * perturbation;
+    	mat33 const diffOri  = AxisAngle(rotationVector, norm(rotationVector)).rotationMatrix();
+
+    	TS_ASSERT_LESS_THAN(max(abs((diffPosi - deltaPosi) / deltaPosi)), 0.01);
+    	TS_ASSERT_LESS_THAN(max(max(abs((diffOri - deltaOri)))), 0.01);
+    }
+
+    void testSolveForJointAngles()
+    {
+    	vec3 const posi_end_body = {40, 100, 200};
+    	AxisAngle const ori_end_body = AxisAngle({0, 0, 0}, 0);
+
+    	ch.solveForJointAngles(posi_end_body, ori_end_body);
+
+    	vec3 const resultPosi = ch.position_end_body_body();
+    	mat33 const resultOri = ch.orientation_end_body();
+    	vec3 const resultAxisAngle = Utility::eulerAnglesToAxisAngle(Utility::rotationMatrixToEulerAngles(ch.orientation_end_body())).asAVector();
+
+    	TS_ASSERT_LESS_THAN(max(abs((resultPosi - posi_end_body) / posi_end_body)), 0.01);
+    	TS_ASSERT_LESS_THAN(max(max(abs(resultOri - ori_end_body.rotationMatrix()))), 0.01);
     }
 };
 

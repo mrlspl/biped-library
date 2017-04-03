@@ -38,9 +38,15 @@
 #include <stdexcept>
 #include <vector>
 #include <armadillo>
+#include <ceres/ceres.h>
 
 using namespace BipedLibrary;
 using namespace BipedLibrary::Utility;
+using ceres::CostFunction;
+using ceres::SizedCostFunction;
+using ceres::Problem;
+using ceres::Solver;
+using ceres::Solve;
 
 Chain::Chain(vec3 const posi_body_body, mat33 const ori_body) :
 posi_body_body_(posi_body_body),
@@ -114,6 +120,11 @@ vec3 Chain::position_base_base(int frame) const
     return position_base_base(frame - 1) + orientation_base(frame - 1) * position_pre_pre(frame);
 }
 
+vec3 Chain::position_body_body(int frame) const
+{
+	return posi_body_body_ + ori_body_ * position_base_base(frame);
+}
+
 vec3 Chain::position_pre_pre(int i) const
 {
     vec3 output;
@@ -158,6 +169,11 @@ mat33 Chain::orientation_base(int frame) const
     
 }
 
+mat33 Chain::orientation_body(int frame) const
+{
+	return ori_body_ * orientation_base(frame);
+}
+
 // TODO: This should be in DHFrame class
 mat33 Chain::orientation_pre(int i) const
 {
@@ -181,33 +197,107 @@ mat33 Chain::orientation_pre(int i) const
 
 }
 
-mat66 Chain::jacobi_base(int frame, bool com) const
+mat66 Chain::jacobi_base(int frame, vec3 target) const
 {
-    mat66 jacobi={0,0,0,0,0,0,
-                   0,0,0,0,0,0,
-                   0,0,0,0,0,0,
-                   0,0,0,0,0,0,
-                   0,0,0,0,0,0,
-                   0,0,0,0,0,0};
-    vec3 z_i_base={0, 0, 0};
-    vec3 matrix={0, 0, 1};
-    vec3 r_frame_i_base;
-    vec3 temp;
+    mat66 jacobi = zeros(6, 6);
+    vec3 const z = {0, 0, 1};
     for (int i=0; i<=frame; i++)
     {
-        z_i_base = orientation_base(i)*matrix;
-//        std::cout << "z_i_base" << z_i_base << std::endl;
-        r_frame_i_base = position_base_base(frame) - position_base_base(i);
-//        std::cout << "r_frame_i_base" << r_frame_i_base << std::endl;
-        if(com==1)
-            r_frame_i_base = r_frame_i_base + (orientation_base(frame) * position_com(i));
-        //jacobi.col(i)={cpm(z_i_base) * r_frame_i_base, r_frame_i_base};
-//        std::cout << "cpm(z_i_base)" << cpm(z_i_base) << std::endl;
-        temp = crossProductMatrix(z_i_base) * r_frame_i_base;
-        for(int j=0; j<=2; j++)
-            jacobi(j,i) = temp(j);  
-        for(int j=0; j<=2; j++)
-            jacobi(j+3,i) = z_i_base(j);
+        vec3 const z_i_base = orientation_base(i) * z;
+        vec3 const r_frame_i_base = position_base_base(frame) - position_base_base(i) + orientation_base(frame) * target;
+        jacobi.col(i).rows(0, 2) = crossProductMatrix(z_i_base) * r_frame_i_base;
+        jacobi.col(i).rows(3, 5) = z_i_base;
     }
+
     return jacobi;
+}
+
+mat66 Chain::jacobi_body(int frame, vec3 target) const
+{
+	mat66 doubleOrientation = zeros(6, 6);
+	doubleOrientation(span(0, 2), span(0, 2)) = ori_body();
+	doubleOrientation(span(3, 5), span(3, 5)) = ori_body();
+
+	return doubleOrientation * jacobi_base(frame, target);
+}
+
+bool Chain::solveForJointAngles(vec3 const& posi_end_body, AxisAngle ori_end_body)
+{
+	google::InitGoogleLogging("");
+
+	class IKCostFunction : public CostFunction
+	{
+	 public:
+		IKCostFunction(Chain& chain, vec3 const& posi_end_body, AxisAngle ori_end_body)
+	 	 : chain_(chain),
+		   posi_end_body_(posi_end_body),
+		   ori_end_body_(ori_end_body.asAVector())
+	 {
+		mutable_parameter_block_sizes()->push_back(chain.size());
+	   set_num_residuals(6);
+	 }
+
+	  virtual ~IKCostFunction() {}
+	  virtual bool Evaluate(double const* const* parameters,
+	                        double* residuals,
+	                        double** jacobians) const
+	  {
+		  int i = 0;
+		  for(DHFrame& frame : chain_)
+		  {
+			  frame.setTheta(parameters[0][i]);
+			  i++;
+		  }
+
+		  vec3 const posiRes = chain_.position_end_body_body() - posi_end_body_;
+		  for(int i = 0; i < 3; i++)
+			  residuals[i] = posiRes(i);
+
+		  vec3 const  oriRes = eulerAnglesToAxisAngle(rotationMatrixToEulerAngles(chain_.orientation_end_body())).asAVector() - ori_end_body_;
+		  for(int i = 0; i < 3; i++)
+			  residuals[i + 3] = oriRes(i);
+
+
+			if (jacobians != NULL && jacobians[0] != NULL)
+			{
+				mat66 jacob = chain_.jacobi_body(5, chain_.posi_end_last_last());
+				for(int i = 0; i < 6; i++)
+					for(int j = 0; j < 6; j++)
+						jacobians[0][i * 6 + j] = jacob(i, j);
+
+			}
+			return true;
+	  }
+	 private:
+	  Chain& chain_;
+	  vec3 posi_end_body_;
+	  vec3 ori_end_body_;
+	};
+
+
+	double joints[size()];
+	std::vector<double*> parameters;
+	parameters.push_back(joints);
+	int i = 0;
+	for(iterator ii = begin(); ii < end(); ii++, i++)
+		joints[i] = ii->theta().toFloat();
+
+	Problem problem;
+	CostFunction *costFunction = new IKCostFunction(*this, posi_end_body, ori_end_body);
+
+	problem.AddResidualBlock(costFunction, NULL, parameters);
+
+	Solver::Options options;
+	options.minimizer_progress_to_stdout = false;
+	options.trust_region_strategy_type = ceres::LEVENBERG_MARQUARDT;
+	options.jacobi_scaling = true;
+	options.check_gradients = true;
+	Solver::Summary summary;
+	Solve(options, &problem, &summary);
+//	std::cout << summary.BriefReport() << "\n";
+
+	for(unsigned i = 0; i < size(); i++)
+		at(i).setTheta(parameters.at(0)[i]);
+
+	return true;
 }

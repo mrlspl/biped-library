@@ -21,6 +21,7 @@ AC_PROG_LIBTOOL
 
 # Checks for libraries.
 AC_CHECK_LIB([armadillo], [arma::ones(10)]) # FIXME: ??
+AC_CHECK_LIB([ceres], [Solver::Options()]) # FIXME: no??
 
 # Checks for header files.
 AC_CHECK_HEADERS(armadillo) # FIXME: ??

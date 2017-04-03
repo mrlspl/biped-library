@@ -43,7 +43,7 @@ angle_(angle)
 {
 }
 
-mat33 AxisAngle::rotationMatrix()
+mat33 AxisAngle::rotationMatrix() const
 {
     vec3 u = normalise(axis_);
     return angle_.cos() * eye(3, 3) + angle_.sin() * crossProductMatrix(u)
@@ -58,6 +58,11 @@ vec3 AxisAngle::axis() const
 Angle AxisAngle::angle() const
 {
     return angle_;
+}
+
+vec3 AxisAngle::asAVector() const
+{
+	return angle_.toFloat() * normalise(axis_);
 }
 
 AxisAngle& AxisAngle::setAxis(vec3 const& axis)

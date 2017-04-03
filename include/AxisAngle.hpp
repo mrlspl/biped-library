@@ -46,10 +46,11 @@ namespace BipedLibrary
     public:
         AxisAngle(vec3 axis = vec3(), Angle angle = Angle());
         
-        mat33 rotationMatrix();
+        mat33 rotationMatrix() const;
         
         vec3 axis() const;
         Angle angle() const;
+        vec3 asAVector() const;
         
         AxisAngle& setAxis(vec3 const& axis);
         AxisAngle& setAngle(Angle const& angle);

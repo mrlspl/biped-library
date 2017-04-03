@@ -33,6 +33,8 @@
 #ifndef BIPED_LIBRARY_UTILITY_H
 #define BIPED_LIBRARY_UTILITY_H
 
+#include "AxisAngle.hpp"
+
 #include <armadillo>
 
 namespace BipedLibrary
@@ -41,6 +43,10 @@ namespace BipedLibrary
     {
         using namespace arma;
         mat33 crossProductMatrix(vec3 vector);
+
+        bool isRotationMatrix(mat33 const& ori);
+        vec3 rotationMatrixToEulerAngles(mat33 const& ori);
+        AxisAngle eulerAnglesToAxisAngle(vec3 const& euler);
     }
 }
 

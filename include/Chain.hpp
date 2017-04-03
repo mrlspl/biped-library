@@ -33,6 +33,7 @@
 
 #pragma once
 #include "DHFrame.hpp"
+#include "AxisAngle.hpp"
 
 #include <vector>
 #include <armadillo>
@@ -59,13 +60,18 @@ namespace BipedLibrary
         
         vec3 position_end_body_body() const;
         vec3 position_base_base(int frame = -1) const;
+        vec3 position_body_body(int frame = -1) const;
         vec3 position_pre_pre(int i) const;
         vec3 position_com (int frame) const;
         mat33 orientation_end_body() const;
+        mat33 orientation_body(int frame = -1) const;
         mat33 orientation_base(int frame = -1) const;
         mat33 orientation_pre(int i) const;
-        mat66 jacobi_base(int frame, bool com) const;
+        mat66 jacobi_base(int frame, vec3 target = {0, 0, 0}) const;
+        mat66 jacobi_body(int frame, vec3 target = {0, 0, 0}) const;
         
+        bool solveForJointAngles(vec3 const& posi_end_body, AxisAngle ori_end_body);
+
     private:
         vec3 posi_body_body_;
         mat33 ori_body_;

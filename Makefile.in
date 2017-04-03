@@ -345,7 +345,8 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I tools/m4
-AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/src -I$(top_srcdir)/tools/cxxtest
+AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/src -I$(top_srcdir)/tools/cxxtest -fopenmp -I/usr/include/eigen3
+AM_LDFLAGS = -fopenmp
 lib_LTLIBRARIES = libbipedlibrary.la
 libbipedlibrary_la_SOURCES = src/Chain.cpp \
                              src/DHFrame.cpp \
@@ -363,7 +364,7 @@ pkginclude_HEADERS = include/Chain.hpp \
 
 libbipedlibrary_la_LIBADD = -larmadillo
 nodist_testrunner_SOURCES = unit-test/main.cpp
-testrunner_LDADD = libbipedlibrary.la
+testrunner_LDADD = libbipedlibrary.la -larmadillo -lceres -lglog -lpthread -llapack -lblas -lcholmod
 CLEANFILES = unit-test/main.cpp
 all: all-am
 

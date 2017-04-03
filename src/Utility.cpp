@@ -31,6 +31,10 @@
  */
 
 #include "Utility.hpp"
+#include "Angle.hpp"
+
+#include <stdexcept>
+#include <cmath>
 
 using namespace BipedLibrary::Utility;
 
@@ -41,4 +45,59 @@ mat33 BipedLibrary::Utility::crossProductMatrix(vec3 vector)
             << vector(2) << 0 << -1 * vector(0) << endr
             << -1 * vector(1) << vector(0) << 0 << endr;
     return cpm_vector;
+}
+
+bool BipedLibrary::Utility::isRotationMatrix(mat33 const& ori)
+{
+    mat33 shouldBeZero = ori.t() * ori - eye(3, 3);
+    return  all(all(shouldBeZero < 1e-6));
+}
+
+vec3 BipedLibrary::Utility::rotationMatrixToEulerAngles(mat33 const& ori)
+{
+    if(!isRotationMatrix(ori))
+    	throw(std::domain_error("Not a rotation matrix in BipedLibrary::Utility::rotationMatrixToEulerAngles"));
+
+    float rx, ry, rz;
+
+    if(ori(2, 0) < -0.999999f)
+    {
+    	rz = 0;
+    	ry = M_PI_2;
+    	rx = std::atan2(ori(0, 1), ori(0, 2));
+        return vec3{rx, ry, rz};
+    }
+
+    if(ori(2, 0) > 0.999999f)
+    {
+    	rz = 0;
+    	ry = -M_PI_2;
+    	rx = std::atan2(-ori(0, 1), -ori(0, 2));
+        return vec3{rx, ry, rz};
+    }
+
+    ry = - std::asin(ori(2, 0));
+    rx = std::atan2(ori(2, 1) / std::cos(ry), ori(2, 2) / std::cos(ry));
+    rz = std::atan2(ori(1, 0) / std::cos(ry), ori(0, 0) / std::cos(ry));
+
+    return vec3{rx, ry, rz};
+}
+
+BipedLibrary::AxisAngle BipedLibrary::Utility::eulerAnglesToAxisAngle(vec3 const& euler)
+{
+	double c1 = std::cos(euler(2) / 2);
+	double s1 = std::sin(euler(2) / 2);
+	double c2 = std::cos(euler(1) / 2);
+	double s2 = std::sin(euler(1) / 2);
+	double c3 = std::cos(euler(0) / 2);
+	double s3 = std::sin(euler(0) / 2);
+	double c1c2 = c1 * c2;
+	double s1s2 = s1 * s2;
+	double w = c1c2 * c3 - s1s2 * s3;
+	double x = c1c2 * s3 + s1s2 * c3;
+	double y = s1 * c2 * c3 + c1 * s2 * s3;
+	double z = c1 * s2 * c3 - s1 * c2 * s3;
+	double angle = 2 * std::acos(w);
+
+	return AxisAngle(vec3{x, y, z}, angle);
 }
