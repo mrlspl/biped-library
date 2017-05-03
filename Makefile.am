@@ -21,7 +21,7 @@ libbipedlibrary_la_LIBADD = -larmadillo
 
 bin_PROGRAMS = testrunner
 nodist_testrunner_SOURCES = unit-test/main.cpp
-testrunner_LDADD = libbipedlibrary.la -larmadillo -lceres -lglog -lpthread -llapack -lblas -lcholmod
+testrunner_LDADD = libbipedlibrary.la -larmadillo -lceres -lglog -lpthread -llapack -lblas
 
 unit-test/main.cpp: unit-test/*.h
 	tools/cxxtest/bin/cxxtestgen --error-printer -o unit-test/main.cpp unit-test/*.h
