@@ -1,1 +1,17 @@
-../../configure --build=i686-pc-linux-gnu "CFLAGS=-m32" "CXXFLAGS=-m32" "LDFLAGS=-m32" --prefix=`pwd`/../mrlspl17/Util/BipedLibrary
+./configure \
+	--build=i686-pc-linux-gnu CXX='clang++ \
+	    --std=c++11 \
+        -march=atom \
+        -target i686-pc-linux-gnu \
+    	-nostdinc \
+    	-nostdinc++ \
+        -nostdlib \
+    	-Iinterface/bhuman/sysroot/include \
+    	-Iinterface/bhuman/sysroot/include/eigen3 \
+    	-I../Buildchain/gcc/include \
+    	-I../Buildchain/gcc/include/c++/5.2.0 \
+    	-I../Buildchain/gcc/include/c++/5.2.0/i686-pc-linux-gnu \
+    	-I../Buildchain/clang/include \
+	    -U_OPENMP \
+    	-DMINIGLOG' \
+    LDFLAGS='-m32 -nostdlib -Wl,--eh-frame-hdr -Wl,-m,elf_i386 -Wl,-dynamic-linker=/lib/ld-linux.so.2 -Linterface/bhuman/sysroot/lib ../Buildchain/gcc/lib/crt1.o ../Buildchain/gcc/lib/crti.o ../Buildchain/gcc/lib/crtbegin.o ../Buildchain/gcc/lib/libstdc++.so.6.0.21 ../Buildchain/gcc/lib/libm-2.13.so ../Buildchain/gcc/lib/libgcc_s.so.1 ../Buildchain/gcc/lib/libc-2.13.so -lc_nonshared ../Buildchain/gcc/lib/ld-2.13.so ../Buildchain/gcc/lib/crtend.o ../Buildchain/gcc/lib/crtn.o'
