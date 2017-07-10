@@ -1,0 +1,9 @@
+#!/bin/sh
+autoreconf -ivf
+./configure
+make -j 16
+sudo make install
+make clean
+interface/bhuman/configurefornao 
+make libbipedlibrary.la -j 16
+
