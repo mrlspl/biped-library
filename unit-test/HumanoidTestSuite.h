@@ -34,6 +34,8 @@ public:
 
         humanoid.mutableHead().push_back(DHFrame());
         TS_ASSERT_EQUALS(humanoid.head().size(), 4);
+
+        humanoid.calibrate();
     }
 };
 

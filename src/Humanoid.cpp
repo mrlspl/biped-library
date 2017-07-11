@@ -32,7 +32,15 @@
  */
 
 #include "Humanoid.hpp"
+#include <ceres/ceres.h>
+#include "glog/logging.h"
 
+using ceres::NumericDiffCostFunction;
+using ceres::CostFunction;
+using ceres::Problem;
+using ceres::Solver;
+using ceres::Solve;
+using ceres::CENTRAL;
 using namespace BipedLibrary;
 
 Humanoid::Humanoid()
@@ -86,3 +94,59 @@ Chain& Humanoid::mutableHead()
 {
     return head_;
 }
+
+static bool googleInitialized = false;
+
+void Humanoid::calibrate()
+{
+	if (!googleInitialized)
+	{
+		google::InitGoogleLogging("");
+		googleInitialized = true;
+	}
+
+	struct f1 {
+		bool operator()(const double* const x1, double* residual) const {
+			residual[0] = x1[0] - 1;
+			return true;
+		}
+	};
+
+	struct f2 {
+		bool operator()(const double* const x2, double* residual) const {
+			residual[0] = x2[0] - 3;
+			return true;
+		}
+	};
+
+	struct f3 {
+		bool operator()(const double* const x3, double* residual) const {
+			residual[0] = x3[0] + 3;
+			return true;
+		}
+	};
+	Problem problem;
+	double x1 = 0; double x2 = 0; double x3 = 0;
+	problem.AddResidualBlock(
+			new NumericDiffCostFunction<f1, CENTRAL, 1, 1>(new f1), NULL, &x1);
+	problem.AddResidualBlock(
+			new NumericDiffCostFunction<f2, CENTRAL, 1, 1>(new f2), NULL, &x2);
+	problem.AddResidualBlock(
+			new NumericDiffCostFunction<f3, CENTRAL, 1, 1>(new f3), NULL, &x3);
+	Solver::Options options;
+	options.max_num_iterations = 100;
+	options.linear_solver_type = ceres::DENSE_QR;
+	options.minimizer_progress_to_stdout = true;
+	Solver::Summary summary;
+	Solve(options, &problem, &summary);
+//	std::cout << summary.FullReport() << "\n";
+	std::cout << "Final x1 = " << x1 << ", x2 = " << x2 << ", x3 = " << x3
+			<< "\n";
+}
+
+
+
+
+
+
+

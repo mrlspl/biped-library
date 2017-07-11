@@ -223,7 +223,7 @@ mat66 Chain::jacobi_body(int frame, vec3 target) const
 
 bool Chain::solveForJointAngles(vec3 const& posi_end_body, AxisAngle ori_end_body)
 {
-	google::InitGoogleLogging("");
+//	google::InitGoogleLogging("");
 
 	class IKCostFunction : public CostFunction
 	{

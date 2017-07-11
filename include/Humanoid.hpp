@@ -56,7 +56,9 @@ namespace BipedLibrary
         Chain& mutableLeftHand();
         Chain& mutableRightHand();
         Chain& mutableHead();
+        void calibrate();
         
+
     private:
         Chain leftHand_;
         Chain rightHand_;
