@@ -6,7 +6,9 @@ lib_LTLIBRARIES = libbipedlibrary.la
 libbipedlibrary_la_SOURCES = src/Chain.cpp \
                              src/DHFrame.cpp \
                              src/Biped.cpp \
+                             src/Camera.cpp \
                              src/Humanoid.cpp \
+                             src/Calibrator.cpp \
 			     src/AxisAngle.cpp \
 			     src/Utility.cpp
 			     
@@ -14,14 +16,16 @@ pkginclude_HEADERS = include/Chain.hpp \
                      include/DHFrame.hpp \
                      include/Angle.hpp \
                      include/Biped.hpp \
+                     include/Camera.hpp \
                      include/Humanoid.hpp \
+                     include/Calibrator.hpp \
 		     include/AxisAngle.hpp
 
 libbipedlibrary_la_LIBADD = -larmadillo
 
 bin_PROGRAMS = testrunner
 nodist_testrunner_SOURCES = unit-test/main.cpp
-testrunner_LDADD = libbipedlibrary.la -larmadillo -lceres -lglog -lpthread -llapack -lblas
+testrunner_LDADD = libbipedlibrary.la -larmadillo -lceres -lglog -lpthread -llapack -lblas -lcholmod
 
 unit-test/main.cpp: unit-test/*.h
 	tools/cxxtest/bin/cxxtestgen --error-printer -o unit-test/main.cpp unit-test/*.h
