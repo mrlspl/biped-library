@@ -34,6 +34,7 @@
 #pragma once
 
 #include "Biped.hpp"
+#include "Camera.hpp"
 
 #include <vector>
 
@@ -43,19 +44,30 @@ namespace BipedLibrary
     class Humanoid : public Biped
     {
     public:
-        Humanoid();
+    				Humanoid();
         
         Chain leftHand() const;
         Chain rightHand() const;
         Chain head() const;
-        
+        Camera camera() const;
+        std::vector <vec3> detectedPoints() const;
+        std::vector <vec3> platePoints() const;
+
         Humanoid& setLeftHand(Chain const& leftHand);
         Humanoid& setRightHand(Chain const& rightHand);
         Humanoid& setHead(Chain const& head);
+        Humanoid& setCamera(Camera const& camera);
+        Humanoid& setDetectedPoints(std::vector <vec3> detectedPoints);
+        Humanoid& setPlatePoints(std::vector <vec3> detectedPoints);
         
         Chain& mutableLeftHand();
         Chain& mutableRightHand();
         Chain& mutableHead();
+        Camera& mutableCamera();
+        std::vector <vec3>& mutableDetectedPoints();
+        std::vector <vec3>& mutablePlatePoints();
+
+        void calculateErrors();
         void calibrate();
         
 
@@ -64,6 +76,14 @@ namespace BipedLibrary
         Chain rightHand_;
         Chain head_;
         
+        std::vector <vec3> detectedPoints_ , platePoints_;
+        Camera camera_;
+
+        class vec_index {
+          public:
+          		arma::vec3 point;
+        				int index;
+          };
     };
 
 }
