@@ -39,7 +39,7 @@
 #include <vector>
 #include <armadillo>
 #include <ceres/ceres.h>
-
+#include <assert.h>
 using namespace BipedLibrary;
 using namespace BipedLibrary::Utility;
 using ceres::CostFunction;
@@ -103,6 +103,24 @@ vec3 Chain::position_end_body_body() const
 {
 	mat33 const ori_last_base = orientation_base();
 	vec3 const posi_end_base_base = position_base_base() + ori_last_base * posi_end_last_last_;
+	assert(!isnan(ori_last_base.at(0)));
+	assert(!isnan(ori_last_base.at(1)));
+	assert(!isnan(ori_last_base.at(2)));
+	assert(!isnan(posi_end_base_base.at(0)));
+	assert(!isnan(posi_end_base_base.at(1)));
+	assert(!isnan(posi_end_base_base.at(2)));
+	assert(!isnan(orientation_base().at(0)));
+	assert(!isnan(orientation_base().at(1)));
+	assert(!isnan(orientation_base().at(2)));
+	assert(!isnan(position_base_base().at(0)));
+	assert(!isnan(position_base_base().at(1)));
+	assert(!isnan(position_base_base().at(2)));
+	assert(!isnan(ori_last_base.at(0)));
+	assert(!isnan(ori_last_base.at(1)));
+	assert(!isnan(ori_last_base.at(2)));
+	assert(!isnan(posi_end_last_last_.at(0)));
+	assert(!isnan(posi_end_last_last_.at(1)));
+	assert(!isnan(posi_end_last_last_.at(2)));
 	return posi_body_body_ + ori_body_ * posi_end_base_base;
 }
 
@@ -163,9 +181,40 @@ mat33 Chain::orientation_base(int frame) const
         throw(std::out_of_range("Index out of range in BipedLibrary::Chain::orientation_base(int)"));
 
     if (frame == 0)
+    {
+    		assert (!isnan(orientation_pre(frame).at(0)));
+    		assert (!isnan(orientation_pre(frame).at(1)));
+    		assert (!isnan(orientation_pre(frame).at(2)));
+    		assert (!isnan(orientation_pre(frame).at(3)));
+    		assert (!isnan(orientation_pre(frame).at(4)));
+    		assert (!isnan(orientation_pre(frame).at(5)));
+    		assert (!isnan(orientation_pre(frame).at(6)));
+    		assert (!isnan(orientation_pre(frame).at(7)));
+    		assert (!isnan(orientation_pre(frame).at(8)));
         return orientation_pre(frame);
+    }
     else
+    {
+  		assert (!isnan(orientation_pre(frame).at(0)));
+  		assert (!isnan(orientation_pre(frame).at(1)));
+  		assert (!isnan(orientation_pre(frame).at(2)));
+  		assert (!isnan(orientation_pre(frame).at(3)));
+  		assert (!isnan(orientation_pre(frame).at(4)));
+  		assert (!isnan(orientation_pre(frame).at(5)));
+  		assert (!isnan(orientation_pre(frame).at(6)));
+  		assert (!isnan(orientation_pre(frame).at(7)));
+  		assert (!isnan(orientation_pre(frame).at(8)));
+  		assert (!isnan(orientation_pre(frame-1).at(0)));
+  		assert (!isnan(orientation_pre(frame-1).at(1)));
+  		assert (!isnan(orientation_pre(frame-1).at(2)));
+  		assert (!isnan(orientation_pre(frame-1).at(3)));
+  		assert (!isnan(orientation_pre(frame-1).at(4)));
+  		assert (!isnan(orientation_pre(frame-1).at(5)));
+  		assert (!isnan(orientation_pre(frame-1).at(6)));
+  		assert (!isnan(orientation_pre(frame-1).at(7)));
+  		assert (!isnan(orientation_pre(frame-1).at(8)));
         return orientation_base(frame-1) * orientation_pre(frame);
+    }
     
 }
 
@@ -181,7 +230,8 @@ mat33 Chain::orientation_pre(int i) const
     Angle theta,alpha;
     theta = at(i).theta();
     alpha = at(i).alpha();
-
+    std::cout << "theta("<<i<<")= " << theta.toFloat() << "  ";
+    assert(!isnan(theta.toFloat()));
     try
     {
         output  << theta.cos()               << -theta.sin()              << 0            << endr

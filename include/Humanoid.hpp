@@ -49,7 +49,8 @@ namespace BipedLibrary
         Chain leftHand() const;
         Chain rightHand() const;
         Chain head() const;
-        Camera camera() const;
+        int cameraIndex() const;
+        std::vector <Camera> camera() const;
         std::vector <vec3> detectedPoints() const;
         std::vector <vec3> platePoints() const;
 
@@ -57,13 +58,14 @@ namespace BipedLibrary
         Humanoid& setRightHand(Chain const& rightHand);
         Humanoid& setHead(Chain const& head);
         Humanoid& setCamera(Camera const& camera);
+        Humanoid& setCameraIndex(int const& cameraIndex);
         Humanoid& setDetectedPoints(std::vector <vec3> detectedPoints);
         Humanoid& setPlatePoints(std::vector <vec3> detectedPoints);
         
         Chain& mutableLeftHand();
         Chain& mutableRightHand();
         Chain& mutableHead();
-        Camera& mutableCamera();
+        std::vector <Camera>& mutableCamera();
         std::vector <vec3>& mutableDetectedPoints();
         std::vector <vec3>& mutablePlatePoints();
 
@@ -77,7 +79,8 @@ namespace BipedLibrary
         Chain head_;
         
         std::vector <vec3> detectedPoints_ , platePoints_;
-        Camera camera_;
+        std::vector <Camera> camera_;
+        int cameraIndex_;
 
         class vec_index {
           public:

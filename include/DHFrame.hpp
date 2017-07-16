@@ -52,11 +52,13 @@ namespace BipedLibrary
 
         unsigned id() const;
         Angle theta() const;
+        Angle deltaTheta() const;
         Angle alpha() const;
         float r() const;
         float d() const;
 
         DHFrame& setTheta(Angle const theta);
+        DHFrame& setDeltaTheta(Angle const deltaTheta);
         DHFrame& setAlpha(Angle const alpha);
         DHFrame& setR(float const r);
         DHFrame& setD(float const d);
@@ -67,6 +69,7 @@ namespace BipedLibrary
         unsigned id_;
         static unsigned lastGenaratedId_;
         Angle theta_;
+        Angle deltaTheta_;
         Angle alpha_;
         float r_;
         float d_;

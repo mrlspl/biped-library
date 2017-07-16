@@ -44,6 +44,7 @@ unsigned DHFrame::lastGenaratedId_ = 0;
 DHFrame::DHFrame(Angle const alpha, Angle const theta, float const r, float const d) :
 id_(++lastGenaratedId_),
 theta_(theta),
+deltaTheta_(0),
 alpha_(alpha),
 r_(r),
 d_(d)
@@ -57,9 +58,14 @@ unsigned DHFrame::id() const
     return id_;
 }
 
+Angle DHFrame::deltaTheta() const
+{
+		return deltaTheta_;
+}
+
 Angle DHFrame::theta() const
 {
-    return theta_;
+    return theta_ + deltaTheta();
 }
 
 Angle DHFrame::alpha() const
@@ -81,6 +87,12 @@ DHFrame& DHFrame::setTheta(Angle const theta)
 {
     theta_ = theta;
     return *this;
+}
+
+DHFrame& DHFrame::setDeltaTheta(Angle const deltaTheta)
+{
+				deltaTheta_ = deltaTheta;
+				return *this;
 }
 
 DHFrame& DHFrame::setAlpha(Angle const alpha)

@@ -35,7 +35,8 @@
 
 using namespace BipedLibrary;
 
-Camera::Camera()
+Camera::Camera():
+		extrinsicCalibration_(vec3 {0,0,0})
 {
 }
 
@@ -49,7 +50,9 @@ vec3 Camera::extrinsicCalibration() const
 }
 mat33 Camera::orientation() const
 {
-		return orientation_;
+		return orientation_ * AxisAngle( { 0, 0, 1 },  extrinsicCalibration().at(2)).rotationMatrix() *
+													AxisAngle( { 0, 1, 0 },  extrinsicCalibration().at(1)).rotationMatrix() *
+													AxisAngle( { 1, 0, 0 },  extrinsicCalibration().at(0)).rotationMatrix();
 }
 vec2 Camera::imageSize() const
 {
@@ -93,6 +96,7 @@ Camera& Camera::setOpenAngle(Angle const& openAngle)
 Camera& Camera::setOpenAngle(float openAngle)
 {
 		openAngle_ = Angle(openAngle);
+		return *this;
 }
 
 vec3& Camera::mutablePosition()

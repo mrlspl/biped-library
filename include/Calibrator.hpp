@@ -52,11 +52,19 @@ namespace BipedLibrary
         
         Humanoid& mutableState(int stateNumber);
 
+        void calculateErrors();
         void calibrate();
         
 
     private:
         std::vector <Humanoid> states_;
+        std::vector <double> errors;
     };
+
+    class vec_index {
+              public:
+              		arma::vec3 point;
+            				int index;
+              };
 
 }

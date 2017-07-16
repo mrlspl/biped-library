@@ -67,7 +67,7 @@ namespace BipedLibrary
 
     private:
         vec3 position_;
-        vec3 extrinsicCalibration_;
+        vec3 extrinsicCalibration_; // extrinsicCalibration .(0) = yaw , .(1) = pitch , .(2) = rol
         mat33 orientation_;
         vec2 imageSize_;
         Angle openAngle_;
