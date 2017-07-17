@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I tools/m4
-AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/src -I$(top_srcdir)/tools/cxxtest -fopenmp -I/usr/include/eigen3
-AM_LDFLAGS = -fopenmp
+AM_CPPFLAGS = -g -I$(top_srcdir)/include -I$(top_srcdir)/src -I$(top_srcdir)/tools/cxxtest -fopenmp -I/usr/include/eigen3
+AM_LDFLAGS = -g -fopenmp
 
 lib_LTLIBRARIES = libbipedlibrary.la
 libbipedlibrary_la_SOURCES = src/Chain.cpp \
