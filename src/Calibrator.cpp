@@ -71,14 +71,11 @@ static bool googleInitialized = false;
 
 void Calibrator::calculateErrors()
 {
+	bool addedDiffs = false;
 
 	errors.resize(0);
-//	for (auto i=states_.end()-1; i>states_.begin(); i--)
-//		states_.erase(i);
-	std::cout << "states_.size= " << states_.size() << std::endl;
 	for (auto& state: states_)
 	{
-
 		//PART 1: here posi_C_B_B and ori_C_B are calculated.
 		// section 1, from Torso to Base by right leg
 		const vec3 posi_RF_T_T = state.rightLeg().position_end_body_body();
@@ -96,28 +93,32 @@ void Calibrator::calculateErrors()
 
 		//section 1.6
 		const vec3 posi_T_B_B = ( posi_lT_B_B + posi_rT_B_B ) / 2;
-		const mat33 ori_T_B = ( ori_rT_B + ori_lT_B ) / 2;
+		const mat33 ori_T_B = ( ori_lT_B + ori_rT_B ) / 2;
+/*
+		const vec3 posiDiff = posi_lT_B_B - posi_rT_B_B;
+		const mat33 oriDiff =  ori_rT_B - ori_lT_B;
+
+		if (!addedDiffs)
+		{
+		for (int i=0; i<posiDiff.size(); i++)
+			errors.push_back(posiDiff.at(i));
+//			std::cout << "posiDiff.at("<< i << ") = " << posiDiff.at(i) << std::endl;
+
+//		posiDiff.print("posiDiff: ");
+		for (int i=0; i<oriDiff.size(); i++)
+//			std::cout << "oriDiff.at("<< i << ") = " << oriDiff.at(i) << std::endl;
+//		oriDiff.print("oriDiff: ");
+			errors.push_back(oriDiff.at(i));
+
+		addedDiffs = true;
+		}
+*/
 
 		//section 2, from Head to Base
 		const vec3 posi_H_T_T = state.head().position_end_body_body();
 		const mat33 ori_H_T = state.head().orientation_end_body();
 		const mat33 ori_H_B = ori_T_B * ori_H_T;
 		const vec3 posi_H_B_B = ori_T_B * posi_H_T_T + posi_T_B_B;
-//		assert (
-//		isnan(state.rightLeg().position_end_body_body().at(0)) ||
-//		isnan(state.rightLeg().position_end_body_body().at(1)) ||
-//		isnan(state.rightLeg().position_end_body_body().at(2)) ||
-////		isnan(state.rightLeg().orientation_end_body().at(0)) ||
-//		isnan(state.leftLeg().position_end_body_body().at(0)) ||
-//		isnan(state.leftLeg().position_end_body_body().at(1)) ||
-//		isnan(state.leftLeg().position_end_body_body().at(2)) ||
-////		state.leftLeg().orientation_end_body().print("state.leftLeg().orientation_end_body(): ");
-//		isnan(state.head().position_end_body_body().at(0)) ||
-//		isnan(state.head().position_end_body_body().at(1)) ||
-//		isnan(state.head().position_end_body_body().at(2)));
-		std::cout << "(.Y.) -- (.Y.) -- (.Y.)" << std::endl;
-//		state.head().orientation_end_body().print("state.head().orientation_end_body(): ");
-
 
 		int cameraNumber = state.cameraIndex();
 		//section 3, from Camera to Base
@@ -158,10 +159,10 @@ void Calibrator::calculateErrors()
 		std::sort (unprojectedPoints.begin(), unprojectedPoints.end(), [](const vec_index& a, const vec_index& b) {
 			return a.point[0] < b.point[0];
 		});
-		std::sort (unprojectedPoints.begin(), unprojectedPoints.begin()+2, [](const vec_index& a, const vec_index& b) {
+		std::sort (unprojectedPoints.begin(), unprojectedPoints.begin()+3, [](const vec_index& a, const vec_index& b) {
 			return a.point[1] < b.point[1];
 		});
-		std::sort (unprojectedPoints.begin()+3, unprojectedPoints.begin()+5, [](const vec_index& a, const vec_index& b) {
+		std::sort (unprojectedPoints.begin()+3, unprojectedPoints.begin()+6, [](const vec_index& a, const vec_index& b) {
 			return a.point[1] < b.point[1];
 		});
 		std::sort (unprojectedPoints.begin()+6, unprojectedPoints.end(), [](const vec_index& a, const vec_index& b) {
@@ -169,10 +170,8 @@ void Calibrator::calculateErrors()
 		});
 
 		//PART 3: here point errors are calculated and added to platePoints vector
-//		std::cout << "Detected Points Size" << state.detectedPoints().size() << std::endl;
 		for (size_t i=0; i<state.detectedPoints().size(); i++)
 		{
-
 			vec3 posi_Pw_B_B = state.platePoints().at(i);
 			vec3 posi_Pw_C_C = trans(ori_I_B) * (posi_Pw_B_B - posi_C_B_B);
 
@@ -186,22 +185,15 @@ void Calibrator::calculateErrors()
 			float xi = posi_Pi_C_C.at(0) + Width/2;
 			float yi = posi_Pi_C_C.at(1) + Height/2;
 			vec2 newPoint = {state.detectedPoints().at(unprojectedPoints.at(i).index).at(0) - xi,
-					state.detectedPoints().at(unprojectedPoints.at(i).index).at(1) - yi};
-//			std::cout << "newPoint.at(" << i << ") = " << newPoint.at(0) << " , newPoint.at(" << i << ") = " << newPoint.at(1) << std::endl;
+											 state.detectedPoints().at(unprojectedPoints.at(i).index).at(1) - yi};
 			errors.push_back(newPoint.at(0));
 			errors.push_back(newPoint.at(1));
 		}
-		std::cout << "---------------------------------------" << std::endl;
 	}
 
 }
 void Calibrator::calibrate()
 {
-//	for (auto& state: states_)
-//	{
-//		state.calculateErrors();
-//	}
-
 	if (!googleInitialized)
 	{
 		google::InitGoogleLogging("");
@@ -228,19 +220,13 @@ void Calibrator::calibrate()
 				for (int i=cameraSize, k=0; i< cameraSize + leftLegSize; i++, k++)
 					state.mutableLeftLeg().at(k).setDeltaTheta(x[i]);
 				for (int i=cameraSize + leftLegSize, k=0; i< cameraSize + leftLegSize + rightLegSize; i++, k++)
-					state.mutableLeftLeg().at(k).setDeltaTheta(x[i]);
+					state.mutableRightLeg().at(k).setDeltaTheta(x[i]);
 				for (int i=cameraSize + leftLegSize + rightLegSize, k=0; i<cameraSize + leftLegSize + rightLegSize + headSize; i++, k++)
 					state.mutableHead().at(k).setDeltaTheta(x[i]);
 			}
 			calibrator_.calculateErrors();
-			std::cout << "Size of errors= " << calibrator_.errors.size() << std::endl;
 			for(int i=0; i<calibrator_.errors.size(); i++)
-			{
 				residual[i] = calibrator_.errors.at(i);
-//				std::cout << "residule[" << i << "]= " << residual[i] << "			";
-			}
-			std::cout << std::endl;
-
 			return true;
 		}
 	};
@@ -253,9 +239,14 @@ void Calibrator::calibrate()
 			new NumericDiffCostFunction<f1, CENTRAL, 126, 20>(new f1(*this)), NULL, x);
 	Solver::Options options;
 	options.max_num_iterations = 1000;
+	options.max_trust_region_radius = 1e5;
+//	options.function_tolerance = 1e-8;
+//	options.parameter_tolerance = 1e-10;
 	options.linear_solver_type = ceres::DENSE_QR;
 	options.minimizer_progress_to_stdout = true;
 	Solver::Summary summary;
 	Solve(options, &problem, &summary);
-	std::cout << summary.FullReport() << "\n";
+//	std::cout << summary.FullReport() << "\n";
+//	for (int i=0; i<20; i++)
+//		std::cout << "Final => x[" << i << "] = " << x[i] << std::endl;
 }
