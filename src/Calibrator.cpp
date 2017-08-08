@@ -34,7 +34,6 @@
 #include "Calibrator.hpp"
 #include <ceres/ceres.h>
 #include "glog/logging.h"
-#include <assert.h>
 using ceres::NumericDiffCostFunction;
 using ceres::CostFunction;
 using ceres::Problem;
