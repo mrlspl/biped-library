@@ -230,7 +230,6 @@ mat33 Chain::orientation_pre(int i) const
     Angle theta,alpha;
     theta = at(i).theta();
     alpha = at(i).alpha();
-    std::cout << "theta("<<i<<")= " << theta.toFloat() << "  ";
     assert(!isnan(theta.toFloat()));
     try
     {
