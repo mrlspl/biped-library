@@ -16,9 +16,14 @@ public:
     {
         vec3 const posi_body_body = {0, 0, 0};
         mat33 const ori_body = {1,0,0,0,1,0,0,0,1};
+        vec3 const posi_end_last = {0, 0, 0};
+        mat33 const ori_end_last = {1,0,0,0,1,0,0,0,1};
         
         ch.setPosi_body_body(posi_body_body);
         ch.setOri_body(ori_body);
+        ch.setPosi_end_last_last(posi_end_last);
+        ch.setOri_end_last(ori_end_last);
+
 
         double p;
         p = datum::pi;
@@ -46,12 +51,12 @@ public:
 
     void testConstructor()
     {
-        vec3 const posi_body_body = {0, 0, 0};
-        vec3 const result={2.4013e+02, 3.9005e-01, -2.4827e+01}; // data88
-        mat33 const ori_body = {1,0,0,0,1,0,0,0,1};
-        
-        Chain ch(posi_body_body, ori_body);
-        
+//        vec3 const posi_body_body = {0, 0, 0};
+//        vec3 const result={2.4013e+02, 3.9005e-01, -2.4827e+01}; // data88
+//        mat33 const ori_body = {1,0,0,0,1,0,0,0,1};
+//
+//        Chain ch(posi_body_body, ori_body);
+//
 //        TS_ASSERT(all(ch.posi_body_body(5) == result));
 //        TS_ASSERT(all(all(ch.ori_body() == ori_body)));
         
@@ -139,19 +144,18 @@ public:
     	TS_ASSERT_LESS_THAN(max(max(abs((diffOri - deltaOri)))), 0.01);
     }
 
-//    void testSolveForJointAngles()
-//    {
-//    	vec3 const posi_end_body = {40, 100, 200};
-//    	AxisAngle const ori_end_body = AxisAngle({0, 0, 0}, 0);
-//
-//    	ch.solveForJointAngles(posi_end_body, ori_end_body);
-//
-//    	vec3 const resultPosi = ch.position_end_body_body();
-//    	mat33 const resultOri = ch.orientation_end_body();
-//    	vec3 const resultAxisAngle = Utility::eulerAnglesToAxisAngle(Utility::rotationMatrixToEulerAngles(ch.orientation_end_body())).asAVector();
-//
-//    	TS_ASSERT_LESS_THAN(max(abs((resultPosi - posi_end_body) / posi_end_body)), 0.01);
-//    	TS_ASSERT_LESS_THAN(max(max(abs(resultOri - ori_end_body.rotationMatrix()))), 0.01);
-//    }
+    void testSolveForJointAngles()
+    {
+    	vec3 const posi_end_body = {40, 100, 200};
+    	mat33 const ori_end_body = eye(3,3);
+
+    	ch.solveForJointAngles(posi_end_body, ori_end_body);
+
+    	vec3 const resultPosi = ch.position_end_body_body();
+    	mat33 const resultOri = ch.orientation_end_body();
+
+    	TS_ASSERT_LESS_THAN(max(abs((resultPosi - posi_end_body) / posi_end_body)), 0.01);
+    	TS_ASSERT_LESS_THAN(max(max(abs(resultOri - ori_end_body))), 0.01);
+    }
 };
 

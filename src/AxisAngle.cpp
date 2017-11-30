@@ -45,9 +45,15 @@ angle_(angle)
 
 mat33 AxisAngle::rotationMatrix() const
 {
+
+	if(angle_.abs().toFloat() < 0.00001 )
+		return eye(3, 3);
+
     vec3 u = normalise(axis_);
     return angle_.cos() * eye(3, 3) + angle_.sin() * crossProductMatrix(u)
-           + (1 - angle_.cos()) * u * u.t();
+           + (1 - angle_.cos()) * (crossProductMatrix(u) * crossProductMatrix(u) + eye(3, 3));
+
+
 }
 
 vec3 AxisAngle::axis() const
@@ -62,6 +68,9 @@ Angle AxisAngle::angle() const
 
 vec3 AxisAngle::asAVector() const
 {
+	if(angle_.isBetween(-0.00001 , 0.00001) )
+		return zeros(3, 1);
+
 	return angle_.toFloat() * normalise(axis_);
 }
 

@@ -151,6 +151,7 @@ vec3 Chain::position_com(int frame) const
 mat33 Chain::orientation_end_body() const
 {
 	return ori_body_ * orientation_base() * ori_end_last_;
+
 }
 
 mat33 Chain::orientation_base(int frame) const
@@ -219,23 +220,27 @@ mat66 Chain::jacobi_body(int frame, vec3 target) const
 	return doubleOrientation * jacobi_base(frame, target);
 }
 
-bool Chain::solveForJointAngles(vec3 const& posi_end_body, AxisAngle ori_end_body)
+bool Chain::solveForJointAngles(vec3 const& posi_end_body, mat33 ori_end_body)
 {
 //	google::InitGoogleLogging("");
 
 	class IKCostFunction : public CostFunction
 	{
 	 public:
-		IKCostFunction(Chain& chain, vec3 const& posi_end_body, AxisAngle ori_end_body)
+		IKCostFunction(Chain& chain, vec3 const& posi_end_body, mat33 ori_end_body)
 	 	 : chain_(chain),
 		   posi_end_body_(posi_end_body),
-		   ori_end_body_(ori_end_body.asAVector())
+		   ori_end_body_(ori_end_body)
 	 {
 		mutable_parameter_block_sizes()->push_back(chain.size());
+
+
+
 	   set_num_residuals(6);
 	 }
 
 	  virtual ~IKCostFunction() {}
+
 	  virtual bool Evaluate(double const* const* parameters,
 	                        double* residuals,
 	                        double** jacobians) const
@@ -251,7 +256,12 @@ bool Chain::solveForJointAngles(vec3 const& posi_end_body, AxisAngle ori_end_bod
 		  for(int i = 0; i < 3; i++)
 			  residuals[i] = posiRes(i);
 
-		  vec3 const  oriRes = eulerAnglesToAxisAngle(rotationMatrixToEulerAngles(chain_.orientation_end_body())).asAVector() - ori_end_body_;
+		  mat33 const  oriResMat = ori_end_body_.t() * chain_.orientation_end_body();
+		  vec3 const oriRes = Utility::rotationMatrixToAxisAngle(oriResMat).asAVector();
+
+//		  vec3 const oriRes = Utility::rotationMatrixToAxisAngle(chain_.orientation_end_body()).asAVector() - Utility::rotationMatrixToAxisAngle(ori_end_body_).asAVector();
+		  std::cout << "oriRes: " << oriRes << std::endl;
+
 		  for(int i = 0; i < 3; i++)
 			  residuals[i + 3] = oriRes(i);
 
@@ -259,6 +269,7 @@ bool Chain::solveForJointAngles(vec3 const& posi_end_body, AxisAngle ori_end_bod
 			if (jacobians != NULL && jacobians[0] != NULL)
 			{
 				mat66 jacob = chain_.jacobi_body(5, chain_.posi_end_last_last());
+				std::cout << "yagjouni: " << jacob << std::endl;
 				for(int i = 0; i < 6; i++)
 					for(int j = 0; j < 6; j++)
 						jacobians[0][i * 6 + j] = jacob(i, j);
@@ -269,7 +280,7 @@ bool Chain::solveForJointAngles(vec3 const& posi_end_body, AxisAngle ori_end_bod
 	 private:
 	  Chain& chain_;
 	  vec3 posi_end_body_;
-	  vec3 ori_end_body_;
+	  mat33 ori_end_body_;
 	};
 
 
@@ -286,13 +297,13 @@ bool Chain::solveForJointAngles(vec3 const& posi_end_body, AxisAngle ori_end_bod
 	problem.AddResidualBlock(costFunction, NULL, parameters);
 
 	Solver::Options options;
-	options.minimizer_progress_to_stdout = false;
+	options.minimizer_progress_to_stdout = true;
 	options.trust_region_strategy_type = ceres::LEVENBERG_MARQUARDT;
 	options.jacobi_scaling = true;
 	options.check_gradients = true;
 	Solver::Summary summary;
 	Solve(options, &problem, &summary);
-//	std::cout << summary.BriefReport() << "\n";
+	std::cout << summary.BriefReport() << "\n";
 
 	for(unsigned i = 0; i < size(); i++)
 		at(i).setTheta(parameters.at(0)[i]);

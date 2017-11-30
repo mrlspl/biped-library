@@ -70,7 +70,7 @@ namespace BipedLibrary
         mat66 jacobi_base(int frame, vec3 target = {0, 0, 0}) const;
         mat66 jacobi_body(int frame, vec3 target = {0, 0, 0}) const;
         
-        bool solveForJointAngles(vec3 const& posi_end_body, AxisAngle ori_end_body);
+        bool solveForJointAngles(vec3 const& posi_end_body, mat33 ori_end_body);
 
     private:
         vec3 posi_body_body_;

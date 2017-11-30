@@ -47,6 +47,7 @@ namespace BipedLibrary
         bool isRotationMatrix(mat33 const& ori);
         vec3 rotationMatrixToEulerAngles(mat33 const& ori);
         AxisAngle eulerAnglesToAxisAngle(vec3 const& euler);
+        AxisAngle rotationMatrixToAxisAngle(mat33 const& rot);
     }
 }
 
