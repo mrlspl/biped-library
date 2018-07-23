@@ -1,5 +1,5 @@
 /*
- *  The MIT License (MIT)
+ *  the MIT License (MIT)
  *
  *  Copyright (c) 2015 MRL-SPL RoboCup Team
  *
@@ -35,7 +35,6 @@
 #include <limits>
 
 #include "DHFrame.hpp"
-#include "unit-test/DHFrameTestSuite.h"
 
 using namespace BipedLibrary;
 
